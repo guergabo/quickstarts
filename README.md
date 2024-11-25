@@ -4,6 +4,8 @@ Antithesis quickstart code sample and tutorials showcasing core Antithesis capab
 
 ## Application 
 
+<img width="1266" alt="Screen Shot 2024-11-25 at 11 50 24 AM" src="https://github.com/user-attachments/assets/6a982f30-8159-4eb1-b5ef-8a25d1bf6e17">
+
 - Golang microservices with Chi
 - Postgres 
 - NATs
