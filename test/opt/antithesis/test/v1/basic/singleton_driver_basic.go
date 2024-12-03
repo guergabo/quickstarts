@@ -175,7 +175,6 @@ func (v *OrderValidator) VRead(result *OrderReadResult) error {
 	case http.StatusBadRequest:
 		return nil // TODO: check if strconv.Atoi fails.
 	case http.StatusInternalServerError:
-		assert.Unreachable("Shouldn't hit this without fault injector", map[string]any{"status_code": result.statusCode})
 		return nil // TODO: can be reached.
 	case http.StatusNotFound:
 		_, err := v.state.Read(result.in)
@@ -188,8 +187,12 @@ func (v *OrderValidator) VRead(result *OrderReadResult) error {
 		if err != nil {
 			return fmt.Errorf("not found order locally even though got found from the service: %v\n", result.in)
 		}
+
 		assert.Always(local.ID == result.out.ID, "", nil)
-		// TODO: asserts or return error.
+		assert.Always(local.Amount == result.out.Amount, "", nil)
+		assert.Always(local.CreatedAt == result.out.CreatedAt, "", nil)
+		assert.Always(local.Customer == result.out.Customer, "", nil)
+		assert.Always(local.Description == result.out.Description, "", nil)
 	default:
 		assert.Unreachable("Status codes not exhaustive", map[string]any{"status_code": result.statusCode})
 	}
@@ -208,7 +211,6 @@ func (v *OrderValidator) VWrite(result *OrderWriteResult) error {
 	case http.StatusBadRequest:
 		return nil // TODO: check if strconv.Atoi fails.
 	case http.StatusInternalServerError:
-		assert.Unreachable("Shouldn't hit this without fault injector", map[string]any{"status_code": result.statusCode})
 		return nil // TODO: can be reached.
 	case http.StatusAccepted:
 		err := v.state.Write(result.out)
@@ -235,14 +237,11 @@ func (c *OrderClient) Read() (*OrderReadResult, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNotFound {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
-
-	if resp.StatusCode == http.StatusNotFound {
+	if resp.StatusCode != http.StatusOK {
 		return &OrderReadResult{
 			in:         orderID,
-			statusCode: http.StatusNotFound,
+			out:        nil,
+			statusCode: resp.StatusCode,
 		}, nil
 	}
 
@@ -251,7 +250,6 @@ func (c *OrderClient) Read() (*OrderReadResult, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error reading response body: %v", err)
 	}
-
 	if err := json.Unmarshal(body, &out); err != nil {
 		return nil, fmt.Errorf("error unmarshaling response: %v", err)
 	}
@@ -281,7 +279,11 @@ func (c *OrderClient) Write() (*OrderWriteResult, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusAccepted {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return &OrderWriteResult{
+			in:         payload,
+			out:        nil,
+			statusCode: resp.StatusCode,
+		}, nil
 	}
 
 	var out Order
@@ -289,7 +291,6 @@ func (c *OrderClient) Write() (*OrderWriteResult, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error reading response body: %v", err)
 	}
-
 	if err := json.Unmarshal(body, &out); err != nil {
 		return nil, fmt.Errorf("error unmarshaling response: %v", err)
 	}
@@ -297,7 +298,7 @@ func (c *OrderClient) Write() (*OrderWriteResult, error) {
 	return &OrderWriteResult{
 		in:         payload,
 		out:        &out,
-		statusCode: http.StatusAccepted,
+		statusCode: resp.StatusCode,
 	}, nil
 }
 
