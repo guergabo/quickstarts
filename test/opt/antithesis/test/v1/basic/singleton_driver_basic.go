@@ -302,8 +302,6 @@ func (c *OrderClient) Write() (*OrderWriteResult, error) {
 	}, nil
 }
 
-func compareOrders(order1, order2 *Order) error { return nil }
-
 func genOrderID() int {
 	return SafeUint64ToIntCapped(random.GetRandom())
 }
