@@ -21,6 +21,11 @@ permissions:
 jobs:
   build: 
     runs-on: ubuntu-latest
+    outputs:
+      config-digest: ${{ steps.build-push-config.outputs.digest }}
+      order-digest: ${{ steps.build-push-order.outputs.digest }}
+      payment-digest: ${{ steps.build-push-payment.outputs.digest }}
+      test-template-digest: ${{ steps.build-push-test-template.outputs.digest }}
 
     strategy:
       matrix:
@@ -57,7 +62,7 @@ jobs:
           antithesis
 
     - name: Build and push ${{ matrix.service.name }}
-      id: build-push
+      id: build-push-${{ matrix.service.name }}
       uses: docker/build-push-action@v5
       with: # might need to adjust context and file. 
         context: ./${{ matrix.service.name }}
@@ -71,25 +76,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    # - name: Run Antithesis Tests
-    #   uses: antithesishq/antithesis-trigger-action@main
-    #   with:
-    #     notebook_name: basic_test                    # (3) Update to your notebook. 
-    #     tenant: ant.dogfood                          # (4) Update to your tenant.
-    #     username: ${{ secrets.ANTITHESIS_USERNAME }} # (5) Add to your repo. 
-    #     password: ${{ secrets.ANTITHESIS_PASSWORD }} # (6) Add to your repo. 
-    #     github_token: ${{ secrets.GH_PAT }}          # (7) ...?
-    #     ###########################################################################
-    #     config_image: config@${{ needs.build.outputs['build-push-config'] }}
-    #     images: >-
-    #       docker.io/antithesishq/order@${{ needs.build-and-test.outputs['build-push-control'] }};
-    #       docker.io/antithesishq/payment@${{ needs.build.outputs['build-push-payment'] }};
-    #       docker.io/antithesishq/test-template@${{ needs.build.outputs['build-push-test-template'] }};
-    #     ###########################################################################
-    #     # TODO: other params like duration and email.
-    #     description: "The CI run for ref - ${{ github.ref_name }} commit # ${{ github.sha }}"
-    #     test_name:  ${{ inputs.test }}
-    #     additional_parameters: |-
-    #       custom.repo_name=${{github.repository}}
-    #       custom.action_name = ${{github.action}}
-    #       custom.actor = ${{ github.actor }}
+
+    - name: Run Antithesis Tests
+      uses: antithesishq/antithesis-trigger-action@main
+      with:
+        notebook_name: basic_test                    # (3) Update to your notebook. 
+        tenant: ant.dogfood                          # (4) Update to your tenant.
+        username: ${{ secrets.ANTITHESIS_USERNAME }} # (5) Add to your repo. 
+        password: ${{ secrets.ANTITHESIS_PASSWORD }} # (6) Add to your repo. 
+        github_token: ${{ secrets.GH_PAT }}          # (7) ...?
+        ###########################################################################
+        config_image: config@${{ needs.build.outputs.config-digest }}
+        images: >-
+          docker.io/antithesishq/order@${{ needs.build.outputs.order-digest }};
+          docker.io/antithesishq/payment@${{ needs.build.outputs.payment-digest }};
+          docker.io/antithesishq/test-template@${{ needs.build.outputs.test-template-digest }};
+        ###########################################################################
+        # TODO: other params like duration and email.
+        description: "The CI run for ref - ${{ github.ref_name }} commit # ${{ github.sha }}"
+        test_name:  ${{ inputs.test }}
+        additional_parameters: |-
+          custom.repo_name=${{github.repository}}
+          custom.action_name = ${{github.action}}
+          custom.actor = ${{ github.actor }}

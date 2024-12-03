@@ -11,7 +11,7 @@ build_all: build_config
 build_config: build_services
 	docker build -t config:v1 -f config/Dockerfile ./config
 
-build_services: build_test_template build_order build_payment
+build_services: build_order build_payment build_test_template
 
 build_order:
 	docker build -t order:v1 -f orderService/Dockerfile ./orderService
