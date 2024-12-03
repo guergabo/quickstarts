@@ -21,11 +21,6 @@ permissions:
 jobs:
   build: 
     runs-on: ubuntu-latest
-    outputs:
-      config-digest: ${{ steps.build-push-config.outputs.digest }}
-      order-digest: ${{ steps.build-push-order.outputs.digest }}
-      payment-digest: ${{ steps.build-push-payment.outputs.digest }}
-      test-template-digest: ${{ steps.build-push-test-template.outputs.digest }}
 
     strategy:
       matrix:
@@ -35,6 +30,10 @@ jobs:
           { name: 'payment', image: 'payment' },
           { name: 'test-template', image: 'test-template' },
         ]
+
+    outputs:
+      ${{ matrix.image }}-digest: ${{ steps.store-digest.outputs.digest }}
+
     permissions:
       contents: read
       packages: write
@@ -62,7 +61,7 @@ jobs:
           antithesis
 
     - name: Build and push ${{ matrix.service.name }}
-      id: build-push-${{ matrix.service.name }}
+      id: build-push
       uses: docker/build-push-action@v5
       with: # might need to adjust context and file. 
         context: ./${{ matrix.service.name }}
@@ -70,6 +69,10 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Store digest for ${{ matrix.service.name }}
+      id: store-digest
+      run: "digest=${{ steps.build-push.outputs.digest }}" >> $GITHUB_OUTPUT
 
   test: 
     needs: build 
@@ -86,11 +89,11 @@ jobs:
         password: ${{ secrets.ANTITHESIS_PASSWORD }} # (6) Add to your repo. 
         github_token: ${{ secrets.GH_PAT }}          # (7) ...?
         ###########################################################################
-        config_image: config@${{ needs.build.outputs.config-digest }}
+        config_image: config@${{ needs.build.outputs["config-digest"] }}
         images: >-
-          docker.io/antithesishq/order@${{ needs.build.outputs.order-digest }};
-          docker.io/antithesishq/payment@${{ needs.build.outputs.payment-digest }};
-          docker.io/antithesishq/test-template@${{ needs.build.outputs.test-template-digest }};
+          docker.io/antithesishq/order@${{ needs.build.outputs["order-digest"] }};
+          docker.io/antithesishq/payment@${{ needs.build.outputs["payment-digest"] }};
+          docker.io/antithesishq/test-template@${{ needs.build.outputs["test-template-digest"] }};
         ###########################################################################
         # TODO: other params like duration and email.
         description: "The CI run for ref - ${{ github.ref_name }} commit # ${{ github.sha }}"
