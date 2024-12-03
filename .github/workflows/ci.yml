@@ -10,10 +10,10 @@ on:
   workflow_dispatch:
     inputs:
       test:
-      description: 'Test name'
-      required: false
-      default: ''
-      type: string
+        description: 'Test name'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
