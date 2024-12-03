@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -15,10 +16,33 @@ import (
 	"github.com/antithesishq/antithesis-sdk-go/random"
 )
 
-type OrderServiceClient struct {
+type Order struct {
+	ID          int64   `json:"id" db:"id"`
+	Amount      float64 `json:"amount" db:"amount"`
+	Currency    string  `json:"currency" db:"currency"`
+	Customer    string  `json:"customer" db:"customer"`
+	Description string  `json:"description" db:"description"`
+	CreatedAt   int64   `json:"created_at" db:"created_at"`
+	UpdatedAt   *int64  `json:"updated_at,omitempty" db:"updated_at"`
+	Status      string  `json:"status" db:"status"`
+}
+
+type OrderClient struct {
 	host string
 	port int
 	http *http.Client
+}
+
+type OrderReadResult struct {
+	in         int64
+	out        *Order
+	statusCode int
+}
+
+type OrderWriteResult struct {
+	in         *Order
+	out        *Order
+	statusCode int
 }
 
 type OrderState struct {
@@ -33,29 +57,24 @@ type SingletonDriverCommand struct {
 	ticks        int
 	readPercent  uint64
 	writePercent uint64
-	client       *OrderServiceClient
+	client       *OrderClient
 	validate     *OrderValidator
 }
 
-type Order struct {
-	ID          int64   `json:"id" db:"id"`
-	Amount      float64 `json:"amount" db:"amount"`
-	Currency    string  `json:"currency" db:"currency"`
-	Customer    string  `json:"customer" db:"customer"`
-	Description string  `json:"description" db:"description"`
-	CreatedAt   int64   `json:"created_at" db:"created_at"`
-	UpdatedAt   *int64  `json:"updated_at,omitempty" db:"updated_at"`
-	Status      string  `json:"status" db:"status"`
-}
-
 func main() {
+	hostPtr := flag.String("host", "order", "Host on which to ping the order service")
+	portPtr := flag.Int("port", 8000, "Port on which to ping the order service")
+
+	assert.Always(hostPtr != nil, "hostPtr should not be nil", nil)
+	assert.Always(portPtr != nil, "portPtr should not be nil", nil)
+
 	// Health check.
 
 	log.Printf("Starting workload...")
 	lifecycle.SendEvent("startingHealthCheck", map[string]any{"tag": "details"})
 
 	for {
-		if err := healthCheck(); err != nil {
+		if err := healthCheck(*hostPtr, *portPtr); err != nil {
 			log.Printf("error making health check request: %v\n", err)
 			lifecycle.SendEvent("serverNotReady", map[string]any{"error": err.Error()})
 			time.Sleep(1 * time.Second)
@@ -71,9 +90,9 @@ func main() {
 	ticks := (SafeUint64ToIntCapped(random.GetRandom()) % 100) + 100 // 1
 	readPercent := random.GetRandom() % 101
 	writePercent := 100 - readPercent
-	client := &OrderServiceClient{
-		host: "order", // TODO: make configurable.
-		port: 8000,    // TODO: make configurable.
+	client := &OrderClient{
+		host: *hostPtr,
+		port: *portPtr,
 		http: http.DefaultClient,
 	}
 	validator := &OrderValidator{
@@ -96,7 +115,7 @@ func main() {
 		"write_percent": cmd.writePercent,
 	})
 
-	// Execute tests.
+	// Generate tests.
 
 	for i := 0; i < cmd.ticks; i++ {
 		if err := cmd.process(); err != nil {
@@ -114,7 +133,7 @@ func (cmd *SingletonDriverCommand) process() error {
 		if err != nil {
 			return err
 		}
-		err = cmd.validate.validateRead(result)
+		err = cmd.validate.VRead(result)
 		if err != nil {
 			return err
 		}
@@ -123,12 +142,11 @@ func (cmd *SingletonDriverCommand) process() error {
 		if err != nil {
 			return err
 		}
-		err = cmd.validate.validateWrite(result)
+		err = cmd.validate.VWrite(result)
 		if err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -145,79 +163,66 @@ func (s *OrderState) Write(in *Order) error {
 	return nil
 }
 
-func (v *OrderValidator) validateRead(result *ReadResult) error {
-	log.Printf("Validating reading order: %v\n", result.orderID)
+func (v *OrderValidator) VRead(result *OrderReadResult) error {
+	log.Printf("Validating reading order: %v\n", result.in)
 
 	assert.Sometimes(result.statusCode == http.StatusBadRequest, "Sometimes status code should be http.StatusBadRequest", nil)
 	assert.Sometimes(result.statusCode == http.StatusInternalServerError, "Sometimes status code should be http.StatusInternalServerError", nil)
 	assert.Sometimes(result.statusCode == http.StatusNotFound, "Sometimes status code should be http.StatusNotFound", nil)
 	assert.Sometimes(result.statusCode == http.StatusOK, "Sometimes status code should be http.StatusOK", nil)
 
-	if result.statusCode == http.StatusBadRequest {
-		// TODO: check if strconv.Atoi fails.
-		return nil
-	}
-	if result.statusCode == http.StatusInternalServerError {
-		// TODO: can be reached.
-		assert.Unreachable("Shouldn't hit this", map[string]any{"status_code": result.statusCode})
-		return nil
-	}
-	if result.statusCode == http.StatusNotFound {
-		_, err := v.state.Read(result.orderID)
+	switch result.statusCode {
+	case http.StatusBadRequest:
+		return nil // TODO: check if strconv.Atoi fails.
+	case http.StatusInternalServerError:
+		assert.Unreachable("Shouldn't hit this without fault injector", map[string]any{"status_code": result.statusCode})
+		return nil // TODO: can be reached.
+	case http.StatusNotFound:
+		_, err := v.state.Read(result.in)
 		if err == nil {
-			return fmt.Errorf("found order locally when got not found from the service: %v\n", result.orderID)
+			return fmt.Errorf("found order locally even though got not found from the service: %v\n", result.in)
 		}
 		return nil
-	}
-	if result.statusCode == http.StatusOK {
-		local, err := v.state.Read(result.order.ID)
+	case http.StatusOK:
+		local, err := v.state.Read(result.out.ID)
 		if err != nil {
-			return fmt.Errorf("not found order locally when got found from the service: %v\n", result.orderID)
+			return fmt.Errorf("not found order locally even though got found from the service: %v\n", result.in)
 		}
-
-		assert.Always(local.ID == result.order.ID, "", nil)
+		assert.Always(local.ID == result.out.ID, "", nil)
 		// TODO: asserts or return error.
+	default:
+		assert.Unreachable("Status codes not exhaustive", map[string]any{"status_code": result.statusCode})
 	}
 
-	assert.Unreachable("Status codes not exhaustive", map[string]any{"status_code": result.statusCode})
 	return nil
 }
 
-func (v *OrderValidator) validateWrite(result *WriteResult) error {
+func (v *OrderValidator) VWrite(result *OrderWriteResult) error {
 	log.Printf("Validating writing order: %v\n", result.out.ID)
 
 	assert.Sometimes(result.statusCode == http.StatusBadRequest, "Sometimes status code should be http.StatusBadRequest", nil)
 	assert.Sometimes(result.statusCode == http.StatusInternalServerError, "Sometimes status code should be http.StatusInternalServerError", nil)
 	assert.Sometimes(result.statusCode == http.StatusAccepted, "Sometimes status code should be http.StatusAccepted", nil)
 
-	if result.statusCode == http.StatusBadRequest {
-		// TODO: check if strconv.Atoi fails.
-		return nil
-	}
-	if result.statusCode == http.StatusInternalServerError {
-		// TODO: can be reached.
-		assert.Unreachable("Shouldn't hit this", map[string]any{"status_code": result.statusCode})
-		return nil
-	}
-
-	if result.statusCode == http.StatusAccepted {
+	switch result.statusCode {
+	case http.StatusBadRequest:
+		return nil // TODO: check if strconv.Atoi fails.
+	case http.StatusInternalServerError:
+		assert.Unreachable("Shouldn't hit this without fault injector", map[string]any{"status_code": result.statusCode})
+		return nil // TODO: can be reached.
+	case http.StatusAccepted:
 		err := v.state.Write(result.out)
 		if err != nil {
 			return err
 		}
+	default:
+		assert.Unreachable("Status codes not exhaustive", map[string]any{"status_code": result.statusCode})
 	}
 
-	assert.Unreachable("Status codes not exhaustive", map[string]any{"status_code": result.statusCode})
 	return nil
 }
 
-type ReadResult struct {
-	orderID    int64
-	order      *Order
-	statusCode int
-}
-
-func (c *OrderServiceClient) Read() (*ReadResult, error) {
+func (c *OrderClient) Read() (*OrderReadResult, error) {
 	orderID := int64(genOrderID())
 
 	assert.Sometimes(orderID%2 == 0, "orderID is sometimes even", map[string]any{"orderID": orderID})
@@ -235,8 +240,8 @@ func (c *OrderServiceClient) Read() (*ReadResult, error) {
 	}
 
 	if resp.StatusCode == http.StatusNotFound {
-		return &ReadResult{
-			orderID:    orderID,
+		return &OrderReadResult{
+			in:         orderID,
 			statusCode: http.StatusNotFound,
 		}, nil
 	}
@@ -251,20 +256,14 @@ func (c *OrderServiceClient) Read() (*ReadResult, error) {
 		return nil, fmt.Errorf("error unmarshaling response: %v", err)
 	}
 
-	return &ReadResult{
-		orderID:    orderID,
-		order:      &out,
+	return &OrderReadResult{
+		in:         orderID,
+		out:        &out,
 		statusCode: http.StatusOK,
 	}, nil
 }
 
-type WriteResult struct {
-	in         *Order
-	out        *Order
-	statusCode int
-}
-
-func (c *OrderServiceClient) Write() (*WriteResult, error) {
+func (c *OrderClient) Write() (*OrderWriteResult, error) {
 	payload := genOrder()
 
 	// TODO: sometimes assertion.
@@ -295,7 +294,7 @@ func (c *OrderServiceClient) Write() (*WriteResult, error) {
 		return nil, fmt.Errorf("error unmarshaling response: %v", err)
 	}
 
-	return &WriteResult{
+	return &OrderWriteResult{
 		in:         payload,
 		out:        &out,
 		statusCode: http.StatusAccepted,
@@ -333,9 +332,8 @@ func SafeUint64ToIntCapped(val uint64) int {
 	return int(val)
 }
 
-func healthCheck() error {
-	host := "order"
-	url := fmt.Sprintf("http://%v:8000/", host) // TODO: make configurable.
+func healthCheck(host string, port int) error {
+	url := fmt.Sprintf("http://%v:%d/", host, port)
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
