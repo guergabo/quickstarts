@@ -70,7 +70,7 @@ func main() {
 
 	// Health check.
 
-	log.Printf("Starting workload...")
+	log.Printf("Starting workload...\n")
 	lifecycle.SendEvent("startingHealthCheck", map[string]any{"tag": "details"})
 
 	for {
