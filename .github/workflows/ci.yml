@@ -21,22 +21,11 @@ permissions:
 jobs:
   build: 
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        service: [
-          { name: 'config', image: 'config' },
-          { name: 'order', image: 'order' },
-          { name: 'payment', image: 'payment' },
-          { name: 'test-template', image: 'test-template' },
-        ]
-
     outputs:
-      ${{ matrix.image }}-digest: ${{ steps.store-digest.outputs.digest }}
-
-    permissions:
-      contents: read
-      packages: write
+      config-digest: ${{ steps.build-config.outputs.digest }}
+      order-digest: ${{ steps.build-order.outputs.digest }}
+      payment-digest: ${{ steps.build-payment.outputs.digest }}
+      test-template-digest: ${{ steps.build-test-template.outputs.digest }}
 
     steps:
     - uses: actions/checkout@v4
@@ -50,29 +39,89 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }} # (1) Add to your repo. 
         password: ${{ secrets.DOCKER_PAT }}      # (2) Add to your repo. 
 
-    - name: Extract metadata (tags) for ${{ matrix.service.name }}
-      id: meta
+    # Config image
+    - name: Extract metadata for config
+      id: meta-config
       uses: docker/metadata-action@v5
       with:
-        images: antithesishq/${{ matrix.service.image }} # TODO: update docker compose?? why not antithesishq?
+        images: antithesishq/config
         tags: |
           type=sha
           type=raw,value=v1
           antithesis
 
-    - name: Build and push ${{ matrix.service.name }}
-      id: build-push
+    - name: Build and push config
+      id: build-config
       uses: docker/build-push-action@v5
-      with: # might need to adjust context and file. 
-        context: ./${{ matrix.service.name }}
-        file: ./${{ matrix.service.name }}/Dockerfile
+      with:
+        context: ./config
+        file: ./config/Dockerfile
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta-config.outputs.tags }}
+        labels: ${{ steps.meta-config.outputs.labels }}
 
-    - name: Store digest for ${{ matrix.service.name }}
-      id: store-digest
-      run: echo "digest=${{ steps.build-push.outputs.digest }}" >> $GITHUB_OUTPUT
+    # Order image 
+    - name: Extract metadata for order
+      id: meta-order
+      uses: docker/metadata-action@v5
+      with:
+        images: antithesishq/order
+        tags: |
+          type=sha
+          type=raw,value=v1
+          antithesis
+
+    - name: Build and push order
+      id: build-order
+      uses: docker/build-push-action@v5
+      with:
+        context: ./order
+        file: ./order/Dockerfile
+        push: true
+        tags: ${{ steps.meta-order.outputs.tags }}
+        labels: ${{ steps.meta-order.outputs.labels }}
+
+    # Payment image
+    - name: Extract metadata for payment
+      id: meta-payment
+      uses: docker/metadata-action@v5
+      with:
+        images: antithesishq/payment
+        tags: |
+          type=sha
+          type=raw,value=v1
+          antithesis
+
+    - name: Build and push payment
+      id: build-payment
+      uses: docker/build-push-action@v5
+      with:
+        context: ./payment
+        file: ./payment/Dockerfile
+        push: true
+        tags: ${{ steps.meta-payment.outputs.tags }}
+        labels: ${{ steps.meta-payment.outputs.labels }}
+
+    # Test template service
+    - name: Extract metadata for test-template
+      id: meta-test-template
+      uses: docker/metadata-action@v5
+      with:
+        images: antithesishq/test-template
+        tags: |
+          type=sha
+          type=raw,value=v1
+          antithesis
+
+    - name: Build and push test-template
+      id: build-test-template
+      uses: docker/build-push-action@v5
+      with:
+        context: ./test-template
+        file: ./test-template/Dockerfile
+        push: true
+        tags: ${{ steps.meta-test-template.outputs.tags }}
+        labels: ${{ steps.meta-test-template.outputs.labels }}
 
   test: 
     needs: build 
@@ -88,17 +137,14 @@ jobs:
         username: ${{ secrets.ANTITHESIS_USERNAME }} # (5) Add to your repo. 
         password: ${{ secrets.ANTITHESIS_PASSWORD }} # (6) Add to your repo. 
         github_token: ${{ secrets.GH_PAT }}          # (7) ...?
-        ###########################################################################
-        config_image: config@${{ needs.build.outputs["config-digest"] }}
+        config_image: config@${{ needs.build.outputs.config-digest }}
         images: >-
-          docker.io/antithesishq/order@${{ needs.build.outputs["order-digest"] }};
-          docker.io/antithesishq/payment@${{ needs.build.outputs["payment-digest"] }};
-          docker.io/antithesishq/test-template@${{ needs.build.outputs["test-template-digest"] }};
-        ###########################################################################
-        # TODO: other params like duration and email.
+          docker.io/antithesishq/order@${{ needs.build.outputs.order-digest }};
+          docker.io/antithesishq/payment@${{ needs.build.outputs.payment-digest }};
+          docker.io/antithesishq/test-template@${{ needs.build.outputs.test-template-digest }};
         description: "The CI run for ref - ${{ github.ref_name }} commit # ${{ github.sha }}"
-        test_name:  ${{ inputs.test }}
+        test_name: ${{ inputs.test }}
         additional_parameters: |-
           custom.repo_name=${{github.repository}}
-          custom.action_name = ${{github.action}}
-          custom.actor = ${{ github.actor }}
+          custom.action_name=${{github.action}}
+          custom.actor=${{ github.actor }}
