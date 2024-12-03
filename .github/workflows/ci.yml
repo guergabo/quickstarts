@@ -102,7 +102,7 @@ jobs:
         tags: ${{ steps.meta-payment.outputs.tags }}
         labels: ${{ steps.meta-payment.outputs.labels }}
 
-    # Test template service
+    # Test template image
     - name: Extract metadata for test-template
       id: meta-test-template
       uses: docker/metadata-action@v5
