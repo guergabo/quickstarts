@@ -43,17 +43,14 @@ jobs:
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        # TODO: swap out to push to antithesis repo. 
-        # username: ${{ secrets.DOCKER_USERNAME }} # Add to your repo. 
-        # password: ${{ secrets.DOCKER_PAT }}      # Add to your repo. 
+        username: ${{ secrets.DOCKER_USERNAME }} # (1) Add to your repo. 
+        password: ${{ secrets.DOCKER_PAT }}      # (2) Add to your repo. 
 
     - name: Extract metadata (tags) for ${{ matrix.service.name }}
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: antithesishq/${{ matrix.service.image }} # TODO: update docker compose?? why antithesishq?
+        images: antithesishq/${{ matrix.service.image }} # TODO: update docker compose?? why not antithesishq?
         tags: |
           type=sha
           type=raw,value=v1
@@ -77,11 +74,11 @@ jobs:
     # - name: Run Antithesis Tests
     #   uses: antithesishq/antithesis-trigger-action@main
     #   with:
-    #     notebook_name: basic_test                    # Update to your notebook. 
-    #     tenant: ant.dogfood                          # Update to your tenant.
-    #     username: ${{ secrets.ANTITHESIS_USERNAME }} # Add to your repo. 
-    #     password: ${{ secrets.ANTITHESIS_PASSWORD }} # Add to your repo. 
-    #     github_token: ${{ secrets.GH_PAT }}          # ...?
+    #     notebook_name: basic_test                    # (3) Update to your notebook. 
+    #     tenant: ant.dogfood                          # (4) Update to your tenant.
+    #     username: ${{ secrets.ANTITHESIS_USERNAME }} # (5) Add to your repo. 
+    #     password: ${{ secrets.ANTITHESIS_PASSWORD }} # (6) Add to your repo. 
+    #     github_token: ${{ secrets.GH_PAT }}          # (7) ...?
     #     ###########################################################################
     #     config_image: config@${{ needs.build.outputs['build-push-config'] }}
     #     images: >-
