@@ -72,7 +72,7 @@ jobs:
 
     - name: Store digest for ${{ matrix.service.name }}
       id: store-digest
-      run: "digest=${{ steps.build-push.outputs.digest }}" >> $GITHUB_OUTPUT
+      run: echo "digest=${{ steps.build-push.outputs.digest }}" >> $GITHUB_OUTPUT
 
   test: 
     needs: build 
