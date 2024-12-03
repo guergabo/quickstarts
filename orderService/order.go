@@ -462,6 +462,7 @@ func (s *OrderService) processEvent(ctx context.Context, tx *sql.Tx, event Order
 		return result
 	}
 
+	// TODO: don't separtae the network calls and just include the statement in a single batch query.
 	ordersEvent, err := markOrderAsProcessed(ctx, tx, event.ID, processedAt)
 	if err != nil {
 		result.Error = fmt.Errorf("failed to mark order %d as processed: %w", event.ID, err)

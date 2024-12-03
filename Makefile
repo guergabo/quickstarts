@@ -1,4 +1,4 @@
-.PHONY: build_all build_workload build_order build_payment
+.PHONY: build_all build_test_template build_order build_payment
 
 up: build_all 
 	docker-compose -f config/docker-compose.yml up
@@ -6,10 +6,10 @@ up: build_all
 down:  
 	docker-compose -f config/docker-compose.yml down -v
 
-build_all: build_workload build_order build_payment
+build_all: build_test_template build_order build_payment
 
-build_workload:
-	docker build -t workload:v1 -f workload/Dockerfile ./workload
+build_test_template: # TODO: turn into sanity check. 
+	docker build -t workload:v1 -f test/opt/antithesis/test/v1/basic/Dockerfile ./test/opt/antithesis/test/v1/basic
 
 build_order:
 	docker build -t order:v1 -f orderService/Dockerfile ./orderService
