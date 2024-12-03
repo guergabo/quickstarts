@@ -148,6 +148,11 @@ func (s *OrderState) Write(in *Order) error {
 func (v *OrderValidator) validateRead(result *ReadResult) error {
 	log.Printf("Validating reading order: %v\n", result.orderID)
 
+	assert.Sometimes(result.statusCode == http.StatusBadRequest, "Sometimes status code should be http.StatusBadRequest", nil)
+	assert.Sometimes(result.statusCode == http.StatusInternalServerError, "Sometimes status code should be http.StatusInternalServerError", nil)
+	assert.Sometimes(result.statusCode == http.StatusNotFound, "Sometimes status code should be http.StatusNotFound", nil)
+	assert.Sometimes(result.statusCode == http.StatusOK, "Sometimes status code should be http.StatusOK", nil)
+
 	if result.statusCode == http.StatusBadRequest {
 		// TODO: check if strconv.Atoi fails.
 		return nil
@@ -180,6 +185,10 @@ func (v *OrderValidator) validateRead(result *ReadResult) error {
 
 func (v *OrderValidator) validateWrite(result *WriteResult) error {
 	log.Printf("Validating writing order: %v\n", result.out.ID)
+
+	assert.Sometimes(result.statusCode == http.StatusBadRequest, "Sometimes status code should be http.StatusBadRequest", nil)
+	assert.Sometimes(result.statusCode == http.StatusInternalServerError, "Sometimes status code should be http.StatusInternalServerError", nil)
+	assert.Sometimes(result.statusCode == http.StatusAccepted, "Sometimes status code should be http.StatusAccepted", nil)
 
 	if result.statusCode == http.StatusBadRequest {
 		// TODO: check if strconv.Atoi fails.

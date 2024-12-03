@@ -31,8 +31,8 @@ curl -X POST \
   http://localhost:8000/orders \
   -H 'Content-Type: application/json' \
   -d '{
-    "amount": 99.99
-		"currency": "usd",
+    "amount": 99.99,
+    "currency": "usd",
     "customer": "Alice_123",
 		"description": "This is demo"
   }'
