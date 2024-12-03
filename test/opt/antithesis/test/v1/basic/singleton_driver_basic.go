@@ -257,7 +257,7 @@ func (c *OrderClient) Read() (*OrderReadResult, error) {
 	return &OrderReadResult{
 		in:         orderID,
 		out:        &out,
-		statusCode: http.StatusOK,
+		statusCode: resp.StatusCode,
 	}, nil
 }
 
