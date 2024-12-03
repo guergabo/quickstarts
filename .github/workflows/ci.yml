@@ -27,7 +27,7 @@ jobs:
         service: [
           { name: 'config', image: 'config' },
           { name: 'order', image: 'order' },
-          { name: 'payment', image: 'payment' }
+          { name: 'payment', image: 'payment' },
           { name: 'test-template', image: 'test-template' },
         ]
     permissions:
