@@ -76,8 +76,8 @@ jobs:
       id: build-order
       uses: docker/build-push-action@v5
       with:
-        context: ./order
-        file: ./order/Dockerfile
+        context: ./orderService
+        file: ./orderService/Dockerfile
         push: true
         tags: ${{ steps.meta-order.outputs.tags }}
         labels: ${{ steps.meta-order.outputs.labels }}
@@ -97,8 +97,8 @@ jobs:
       id: build-payment
       uses: docker/build-push-action@v5
       with:
-        context: ./payment
-        file: ./payment/Dockerfile
+        context: ./paymentService
+        file: ./paymentService/Dockerfile
         push: true
         tags: ${{ steps.meta-payment.outputs.tags }}
         labels: ${{ steps.meta-payment.outputs.labels }}
