@@ -140,7 +140,7 @@ jobs:
         tenant: brick-whale
         username: ${{ secrets.ANTITHESIS_USERNAME }} # (5) Add to your repo. 
         password: ${{ secrets.ANTITHESIS_PASSWORD }} # (6) Add to your repo. 
-        # github_token: ${{ secrets.GH_PAT }}        # (7) ...?
+        github_token: ${{ secrets.GITHUB_TOKEN }}    # (7) GH_PAT?
         email_recipients: gguergabo@gmail.com        # (8)
         config_image: config@${{ needs.build.outputs.config-digest }}
         images: >-
