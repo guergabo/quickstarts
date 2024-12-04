@@ -39,6 +39,9 @@ var (
 	//go:embed db/ops/order_get.sql
 	getOrderQuery string
 
+	//go:embed db/ops/order_list.sql
+	listOrderQuery string
+
 	//go:embed db/ops/order_process.sql
 	getUnprocessedOrdersQuery string
 
@@ -137,6 +140,7 @@ func (s *OrderService) Routes() chi.Router {
 	r.Route("/{orderID}", func(r chi.Router) {
 		r.Get("/", s.Get)
 	})
+	r.Get("/", s.List)
 	return r
 }
 
@@ -310,6 +314,69 @@ func (s *OrderService) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	out, err := json.Marshal(order)
+	if err != nil {
+		http.Error(w, "Failed to serialize response", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(out)
+}
+
+func (s *OrderService) List(w http.ResponseWriter, r *http.Request) {
+	assert.Always(s.started, "Service must be started before handling requests", Details{"op": "get_order"})
+
+	tx, err := s.db.BeginTx(r.Context(), nil)
+	if err != nil {
+		http.Error(w, "Failed to begin transaction", http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback()
+
+	var orders []Order
+	rows, err := tx.QueryContext(r.Context(), listOrderQuery)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			http.Error(w, "Failed to get orders", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	for rows.Next() {
+		var order Order
+		err = rows.Scan(
+			&order.ID,
+			&order.Amount,
+			&order.Currency,
+			&order.Customer,
+			&order.Description,
+			&order.CreatedAt,
+			&order.UpdatedAt,
+			&order.Status,
+		)
+		if err != nil {
+			http.Error(w, "Failed to scan order", http.StatusInternalServerError)
+			return
+		}
+		orders = append(orders, order)
+	}
+
+	if err = rows.Err(); err != nil {
+		http.Error(w, "Error iterating rows", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Number of orders: %d\n", len(orders))
+
+	assert.Always(len(orders) >= 0, "Retrieved number of orders must be a non-negative amount", Details{"length": len(orders)})
+
+	if err = tx.Commit(); err != nil {
+		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
+		return
+	}
+
+	out, err := json.Marshal(orders)
 	if err != nil {
 		http.Error(w, "Failed to serialize response", http.StatusInternalServerError)
 		return
