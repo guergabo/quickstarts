@@ -80,13 +80,13 @@ services:
         ipv4_address: 10.0.0.14
     ports:
       - "4222:4222"  
-      - "8222:8222"  # Added monitoring port
+      - "8222:8222"
     command: [
       "--user=guergabo", 
       "--pass=password",
       "-js",                       
       "--store_dir=/data",
-      "-m=8222"      # Enable monitoring on port 8222     
+      "-m=8222"
     ]
     volumes:
       - nats_data:/data   
