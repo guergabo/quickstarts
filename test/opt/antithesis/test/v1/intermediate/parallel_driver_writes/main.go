@@ -91,7 +91,7 @@ func main() {
 		http: http.DefaultClient,
 	}
 
-	cmd := ParallelDriverCommand{
+	cmd := &ParallelDriverCommand{
 		ticks,
 		&c,
 		client,
@@ -138,6 +138,7 @@ func (cmd *ParallelDriverCommand) process() error {
 
 	return nil
 }
+
 func (c *counter) save() error {
 	// TODO: a failure mid-operation can leave the file in a partially written state. Make it an atomic Write.
 	return os.WriteFile(c.file, []byte(strconv.Itoa(int(c.count))), 0644)

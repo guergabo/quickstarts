@@ -101,7 +101,7 @@ func main() {
 		},
 	}
 
-	cmd := SingletonDriverCommand{
+	cmd := &SingletonDriverCommand{
 		ticks,
 		readPercent,
 		writePercent,
