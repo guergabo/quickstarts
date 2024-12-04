@@ -151,6 +151,3 @@ jobs:
           docker.io/stripemock/stripe-mock:latest;
         additional_parameters: |-
           antithesis.duration=5
-          custom.repo_name=${{github.repository}}
-          custom.action_name=${{github.action}}
-          custom.actor=${{ github.actor }}
