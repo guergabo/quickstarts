@@ -130,14 +130,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+# HERE
     - name: Run Antithesis Tests
       uses: antithesishq/antithesis-trigger-action@main
       with:
         test_name: ${{ inputs.test }}
         description: "The CI run for ref - ${{ github.ref_name }} commit # ${{ github.sha }}"
         notebook_name: basic_test                    # (3) Update to your notebook. 
-        # tenant: ant.dogfood                          # (4) Update to your tenant.
-        tenant: brick-whale
+        tenant: brick-whale                          # (4) Update to your tenant.
         username: ${{ secrets.ANTITHESIS_USERNAME }} # (5) Add to your repo. 
         password: ${{ secrets.ANTITHESIS_PASSWORD }} # (6) Add to your repo. 
         github_token: ${{ secrets.GITHUB_TOKEN }}    # (7) GH_PAT?
