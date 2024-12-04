@@ -45,7 +45,7 @@ jobs:
       id: meta-config
       uses: docker/metadata-action@v5
       with:
-        images: antithesishq/config
+        images: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/config
         tags: |
           type=sha
           type=raw,value=v1
@@ -66,7 +66,7 @@ jobs:
       id: meta-order
       uses: docker/metadata-action@v5
       with:
-        images: antithesishq/order
+        images: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/order
         tags: |
           type=sha
           type=raw,value=v1
@@ -87,7 +87,7 @@ jobs:
       id: meta-payment
       uses: docker/metadata-action@v5
       with:
-        images: antithesishq/payment
+        images: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/payment
         tags: |
           type=sha
           type=raw,value=v1
@@ -108,7 +108,7 @@ jobs:
       id: meta-test-template
       uses: docker/metadata-action@v5
       with:
-        images: antithesishq/test-template
+        images: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/test-template
         tags: |
           type=sha
           type=raw,value=v1
