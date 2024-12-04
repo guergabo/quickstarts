@@ -148,7 +148,7 @@ jobs:
           docker.io/antithesishq/payment@${{ needs.build.outputs.payment-digest }};
           docker.io/antithesishq/test-template@${{ needs.build.outputs.test-template-digest }};
         additional_parameters: |-
-          custom.duration=5
+          antithesis.duration=5
           custom.repo_name=${{github.repository}}
           custom.action_name=${{github.action}}
           custom.actor=${{ github.actor }}
