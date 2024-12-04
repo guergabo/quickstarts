@@ -1,15 +1,16 @@
 version: '3.8'
 
 services:
-  service.workload:
-    image: workload:v1
-    container_name: workload
+  service.test-template:
+    image: test-template:v1
+    container_name: test-template
     networks:
       basic-net:
         ipv4_address: 10.0.0.10
     user: root
     depends_on: 
       - service.order
+    # TODO: have to add environment variables.
 
   service.order:
     image: order:v1
@@ -50,7 +51,7 @@ services:
       - infra.stripe-mock
 
   infra.postgres: 
-    image: postgres:16
+    image: docker.io/postgres:16
     container_name: postgres
     hostname: postgres
     networks:
@@ -72,7 +73,7 @@ services:
       start_period: 10s
 
   infra.nats:
-    image: nats:latest
+    image: docker.io/nats:latest
     container_name: nats
     hostname: nats
     networks:
@@ -98,7 +99,7 @@ services:
       start_period: 5s
 
   infra.stripe-mock:
-    image: stripemock/stripe-mock:latest
+    image: docker.io/stripemock/stripe-mock:latest
     container_name: stripe-mock
     hostname: stripe-mock
     networks:

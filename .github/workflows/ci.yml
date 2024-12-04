@@ -130,7 +130,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-# HERE
     - name: Run Antithesis Tests
       uses: antithesishq/antithesis-trigger-action@main
       with:
@@ -140,13 +139,16 @@ jobs:
         tenant: brick-whale                          # (4) Update to your tenant.
         username: ${{ secrets.ANTITHESIS_USERNAME }} # (5) Add to your repo. 
         password: ${{ secrets.ANTITHESIS_PASSWORD }} # (6) Add to your repo. 
-        github_token: ${{ secrets.GITHUB_TOKEN }}    # (7) GH_PAT?
+        github_token: ${{ secrets.GH_PAT }}          # (7) Add to your repo with specific permissions (check docs).
         email_recipients: gguergabo@gmail.com        # (8)
-        config_image: config@${{ needs.build.outputs.config-digest }}
+        config_image: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/config:v1
         images: >-
-          docker.io/antithesishq/order@${{ needs.build.outputs.order-digest }};
-          docker.io/antithesishq/payment@${{ needs.build.outputs.payment-digest }};
-          docker.io/antithesishq/test-template@${{ needs.build.outputs.test-template-digest }};
+          us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/order:v1;
+          us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/payment:v1;
+          us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/test-template:v1;
+          docker.io/postgres:16;
+          docker.io/nats:latest;
+          docker.io/stripemock/stripe-mock:latest;
         additional_parameters: |-
           antithesis.duration=5
           custom.repo_name=${{github.repository}}

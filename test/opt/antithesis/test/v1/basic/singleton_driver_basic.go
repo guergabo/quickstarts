@@ -62,6 +62,7 @@ type SingletonDriverCommand struct {
 }
 
 func main() {
+	// TODO: how would this be wired up? 
 	hostPtr := flag.String("host", "order", "Host on which to ping the order service")
 	portPtr := flag.Int("port", 8000, "Port on which to ping the order service")
 

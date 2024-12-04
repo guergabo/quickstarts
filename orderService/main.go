@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	_ "embed"
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -15,7 +16,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	_ "github.com/lib/pq"
-	"github.com/nats-io/nats.go"
 )
 
 type (
@@ -23,7 +23,13 @@ type (
 )
 
 func main() {
-	// todo: flags, cli to run...
+
+	dbHostPtr := flag.String("db-host", "postgres", "Database host address")
+	// dbPortPtr := flag.Int("db-port", 5432, "Database port")
+	// dbNamePtr := flag.String("db-name", "orderdb", "Database name")
+	// dbUserPtr := flag.String("db-user", "orderuser", "Database username")
+	// dbPasswordPtr := flag.String("db-password", "orderpass", "Database password")
+	natsUrlPtr := flag.String("nats-url", "nats://nats:4222", "NATS server URL")
 
 	assert.Always(true, "Instantiates an Order REST API", nil)
 
@@ -37,8 +43,7 @@ func main() {
 	// Nats connection setup.
 	log.Printf("Connecting to message broker...\n")
 	nc := &NatsConfig{
-		URL: nats.DefaultURL,
-		// URL:      "nats://nats:4222", // TODO: configure.
+		URL:      *natsUrlPtr,
 		Username: "guergabo",
 		Password: "password",
 		Stream:   "Order", // coordinate with query...
@@ -58,8 +63,7 @@ func main() {
 	cfg := &Config{
 		Username: "guergabo",
 		Password: "password",
-		Host:     "localhost",
-		// Host:     "postgres", // TODO: configure.
+		Host:     *dbHostPtr,
 		Port:     "5432",
 		Database: "postgres",
 	}

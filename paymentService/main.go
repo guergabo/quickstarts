@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"time"
 
@@ -21,17 +22,17 @@ type (
 
 func main() {
 
-	// TODO: configuration.
-
 	// Nats Consumer.
+
+	natsURLPtr := flag.String("nats-url", "nats://nats:4222", "NATS URL")
+	// stripeBaseURL := flag.String("stripe-based-url", "http://stripe-mock:12111", "Stripe Base URL")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	log.Printf("Connecting to message broker...\n")
 	nc := &NatsConfig{
-		// URL:      nats.DefaultURL,
-		URL:      "nats://nats:4222", // TODO: configure.
+		URL:      *natsURLPtr,
 		Username: "guergabo",
 		Password: "password",
 		Stream:   "Order",

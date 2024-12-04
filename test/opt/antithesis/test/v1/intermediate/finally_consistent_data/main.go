@@ -51,6 +51,8 @@ type FinallyQuiescentCommand struct {
 // be updated to pass finally... in the producer db.
 // and go go go... implement that though.
 func main() {
+
+	// TODO: needs to environment variables.
 	hostPtr := flag.String("host", "order", "Host on which to ping the order service")
 	portPtr := flag.Int("port", 8000, "Port on which to ping the order service")
 
