@@ -36,9 +36,9 @@ jobs:
     - name: Login to Antithesis Google Artifact Registry
       uses: docker/login-action@v3
       with:
-      registry: us-central1-docker.pkg.dev 
-      username: _json_key                          # (1) Add to your repo.
-      password: ${{ secrets.ANTITHESIS_GAR_KEY }}  # (2) Add to your repo.
+        registry: us-central1-docker.pkg.dev 
+        username: _json_key                          # (1) Add to your repo.
+        password: ${{ secrets.ANTITHESIS_GAR_KEY }}  # (2) Add to your repo.
 
     # Config image
     - name: Extract metadata for config
