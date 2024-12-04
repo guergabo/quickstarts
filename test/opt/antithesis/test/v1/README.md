@@ -34,4 +34,11 @@ After `first` command and during a period where Antithesis may be adding faults 
 ### Advanced Commands 
 
 1. `finally_`: May only run in a branch where every driver command that was started has also completed succesfully.
-2. `anytime_`: May run at any time after the `first` coman, including during `singleton` or `serial` driver commands. (SPECIAL OVERLAP, other one is parallel, but with its sel not aong serial and singleton).
+2. `anytime_`: May run at any time after the `first` command, including during `singleton` or `serial` driver commands. (SPECIAL OVERLAP, other one is parallel, but with its sel not aong serial and singleton).
+
+## Dockerfile 
+
+```
+make build_test_template 
+docker run -it --entrypoint /bin/bash workload:v1
+```

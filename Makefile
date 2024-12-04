@@ -20,4 +20,4 @@ build_payment:
 	docker build -t payment:v1 -f paymentService/Dockerfile ./paymentService
 
 build_test_template: # TODO: turn into useful sanity check. 
-	docker build -t workload:v1 -f test/opt/antithesis/test/v1/basic/Dockerfile ./test/opt/antithesis/test/v1/basic
+	docker build -t workload:v1 -f test/opt/antithesis/test/v1/Dockerfile ./test/opt/antithesis/test/v1/

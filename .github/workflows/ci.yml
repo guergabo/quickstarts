@@ -117,7 +117,7 @@ jobs:
       id: build-test-template
       uses: docker/build-push-action@v5
       with:
-        context: ./test-template
+        context: ./test-template # change to map to make. 
         file: ./test-template/Dockerfile
         push: true
         tags: ${{ steps.meta-test-template.outputs.tags }}
@@ -132,6 +132,8 @@ jobs:
     - name: Run Antithesis Tests
       uses: antithesishq/antithesis-trigger-action@main
       with:
+        test_name: ${{ inputs.test }}
+        description: "The CI run for ref - ${{ github.ref_name }} commit # ${{ github.sha }}"
         notebook_name: basic_test                    # (3) Update to your notebook. 
         tenant: ant.dogfood                          # (4) Update to your tenant.
         username: ${{ secrets.ANTITHESIS_USERNAME }} # (5) Add to your repo. 
@@ -142,8 +144,6 @@ jobs:
           docker.io/antithesishq/order@${{ needs.build.outputs.order-digest }};
           docker.io/antithesishq/payment@${{ needs.build.outputs.payment-digest }};
           docker.io/antithesishq/test-template@${{ needs.build.outputs.test-template-digest }};
-        description: "The CI run for ref - ${{ github.ref_name }} commit # ${{ github.sha }}"
-        test_name: ${{ inputs.test }}
         additional_parameters: |-
           custom.repo_name=${{github.repository}}
           custom.action_name=${{github.action}}

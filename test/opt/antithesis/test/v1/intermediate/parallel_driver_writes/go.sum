@@ -1,0 +1,4 @@
+github.com/antithesishq/antithesis-sdk-go v0.4.2 h1:cYLNRnojCYp6rKoLKdK6M9UKi9EahFXBtF6WR1vc6V0=
+github.com/antithesishq/antithesis-sdk-go v0.4.2/go.mod h1:IUpT2DPAKh6i/YhSbt6Gl3v2yvUZjmKncl7U91fup7E=
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
