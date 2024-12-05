@@ -142,12 +142,13 @@ jobs:
         github_token: ${{ secrets.GH_PAT }}          # (7) Add to your repo with specific permissions (check docs).
         email_recipients: gguergabo@gmail.com        # (8)
         config_image: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/config:v1
-        images: >-
-          us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/order:v1;
-          us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/payment:v1;
-          us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/test-template:v1;
-          docker.io/postgres:16;
-          docker.io/nats:latest;
-          docker.io/stripemock/stripe-mock:latest;
+        images: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/order:v1;us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/payment:v1;us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/test-template:v1;docker.io/postgres:16;docker.io/nats:latest;docker.io/stripemock/stripe-mock:latest;
+        # images: >-
+        #   us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/order:v1;
+        #   us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/payment:v1;
+        #   us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/test-template:v1;
+        #   docker.io/postgres:16;
+        #   docker.io/nats:latest;
+        #   docker.io/stripemock/stripe-mock:latest;
         additional_parameters: |-
           antithesis.duration=5
