@@ -12,14 +12,46 @@ on:
       test:
         description: 'Test name'
         required: false
-        default: ''
+        default: 'Test'
         type: string
 
 permissions:
   contents: read
 
 jobs:
+  copy-external-images:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Antithesis Google Artifact Registry
+      uses: docker/login-action@v3
+      with:
+        registry: us-central1-docker.pkg.dev
+        username: _json_key
+        password: ${{ secrets.ANTITHESIS_GAR_KEY }}
+
+    - name: Copy Postgres image
+      run: |
+        docker pull postgres:16
+        docker tag postgres:16 us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/postgres:16
+        docker push us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/postgres:16
+
+    - name: Copy NATS image
+      run: |
+        docker pull nats:latest
+        docker tag nats:latest us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/nats:latest
+        docker push us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/nats:latest
+
+    - name: Copy Stripe Mock image
+      run: |
+        docker pull stripemock/stripe-mock:latest
+        docker tag stripemock/stripe-mock:latest us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/stripe-mock:latest
+        docker push us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/stripe-mock:latest
+
   build: 
+    needs: copy-external-images
     runs-on: ubuntu-latest
     outputs:
       config-digest: ${{ steps.build-config.outputs.digest }}
@@ -146,8 +178,8 @@ jobs:
           us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/order:v1;
           us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/payment:v1;
           us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/test-template:v1;
-          docker.io/postgres:16;
-          docker.io/nats:latest;
-          docker.io/stripemock/stripe-mock:latest;
+          us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/postgres:16;
+          us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/nats:latest;
+          us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/stripemock/stripe-mock:latest;
         additional_parameters: |-
           antithesis.duration=5
