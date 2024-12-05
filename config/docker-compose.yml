@@ -51,7 +51,7 @@ services:
       - infra.stripe-mock
 
   infra.postgres: 
-    image: postgres:16
+    image: docker.io/postgres:16
     container_name: postgres
     hostname: postgres
     networks:
@@ -73,7 +73,7 @@ services:
       start_period: 10s
 
   infra.nats:
-    image: nats:latest
+    image: docker.io/nats:latest
     container_name: nats
     hostname: nats
     networks:
@@ -99,7 +99,7 @@ services:
       start_period: 5s
 
   infra.stripe-mock:
-    image: stripemock/stripe-mock:latest
+    image: docker.io/stripemock/stripe-mock:latest
     container_name: stripe-mock
     hostname: stripe-mock
     networks:
