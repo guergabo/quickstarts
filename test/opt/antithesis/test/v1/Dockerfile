@@ -69,15 +69,15 @@ COPY --from=builder \
 # Copy symbols for each component (??? how does this work with multiple???)
 COPY --from=builder \
     /commands/src/antithesis/commands-instrumented/basic/symbols/* \
-    /symbols/basic/
+    /symbols/
 
 COPY --from=builder \
     /commands/src/antithesis/commands-instrumented/intermediate/finally_consistent_data/symbols/* \
-    /symbols/intermediate/finally_consistent_data/
+    /symbols/
 
 COPY --from=builder \
     /commands/src/antithesis/commands-instrumented/intermediate/parallel_driver_writes/symbols/* \
-    /symbols/intermediate/parallel_driver_writes/
+    /symbols/
 
 # Make all executables runnable
 RUN chmod +x /opt/antithesis/test/v1/basic/singleton_driver_basic \
