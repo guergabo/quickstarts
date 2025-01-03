@@ -115,7 +115,7 @@ Congratulations on launching your first test run\! While the test is running (it
 
 ## 6\) View Antithesis Test Report
 
-After 30 minutes, you should receive a test report in your email that looks like the image below. To interpret the results, please refer to our [documentation on test reports](https://www.antithesis.com/docs/reports/triage/).
+After 30 minutes, you should receive a test report in your email that looks like the image below. To interpret the results, please refer to our [documentation on test reports](https://www.antithesis.com/docs/reports/triage/). (*Pro tip: search the project's codebase for "BUG:" and you will find the 3 Always assertion failing*)
 
 <img width="1506" alt="Screenshot 2025-01-03 at 2 32 30 AM" src="https://github.com/user-attachments/assets/d8090ec3-d138-4ca4-a710-7401bf2221f3" />
 

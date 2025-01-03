@@ -222,7 +222,7 @@ func (s *OrderService) Create(w http.ResponseWriter, r *http.Request) {
 
 	assert.AlwaysOrUnreachable(result.Order.UpdatedAt == nil, "New orders must have a null updated_at", Details{"updated_at": result.Order.UpdatedAt})
 	assert.AlwaysOrUnreachable(result.Order.Status == OrderStatusPending, "New orders must have a pending status", Details{"status": result.Order.Status})
-	assert.AlwaysOrUnreachable(result.OrderEvent.AggregateType == "Order", "Event must go to the order topic", Details{"aggregate_type": result.OrderEvent.AggregateType})
+	assert.AlwaysOrUnreachable(result.OrderEvent.AggregateType == "Order", "Event must go to the order topic", Details{"aggregate_type": result.OrderEvent.AggregateType}) // BUG: {aggregate_type:orders}
 	assert.AlwaysOrUnreachable(result.OrderEvent.AggregateID == result.Order.ID, "AggregateID must map to orderID", nil)
 	assert.AlwaysOrUnreachable(result.OrderEvent.EventType == "ORDER_CREATED", "New order events must have ORDER_CREATED eventy type", nil)
 
@@ -233,7 +233,7 @@ func (s *OrderService) Create(w http.ResponseWriter, r *http.Request) {
 		"description": req.Description,
 	})
 	assert.AlwaysOrUnreachable(err == nil, "Must be able to marshal expected payload", Details{"error": err})
-	//TODO:  .00 - keep this one for fun... also + finally_consistent assertion one.
+	// BUG:  .00
 	assert.AlwaysOrUnreachable(bytes.Equal(result.OrderEvent.EventPayload, expectedPayload),
 		"Event payload must match expected payload",
 		Details{

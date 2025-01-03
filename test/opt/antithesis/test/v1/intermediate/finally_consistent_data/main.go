@@ -92,7 +92,8 @@ func main() {
 		log.Fatalf("error: %v\n", err)
 	}
 
-	assert.Always(Validate(globalCount, actualCount) == nil, "Order processing is eventually consistent", map[string]any{"global_count": globalCount, "actual_count": actualCount})
+	// BUG: The completion path is not implemented.
+	assert.Always(Validate(globalCount, actualCount) == nil, "Order processing is eventually consistent", map[string]any{"global_count": globalCount, "actual_count": len(actualCount.out)})
 	log.Printf("Completed finally test command\n")
 }
 
@@ -154,12 +155,13 @@ func Validate(globalCount int, source *OrderListResult) error {
 		"actual_count": len(source.out),
 	}
 
-	// 1) assert no incomplete
+	// 1) assert no incomplete (shouldn't pass this).
 	for _, order := range source.out {
-		assert.Always(order.Status != "pending", "Should be completed or failed", nil)
+		assert.Always(order.Status != "pending", "Should be completed or failed", map[string]any{"order_status": order.Status})
 	}
 
-	// 2) assert right number
+	// 2) assert right number (should pass this).
+	// TODO: replace.
 	// assert.AlwaysLessThanOrEqualTo(globalCount, actualCount, "", nil)
 	actualCount := len(source.out)
 	if globalCount == actualCount {
