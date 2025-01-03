@@ -97,5 +97,5 @@ build_and_push_test_template:
 
 build_and_push_all: extract_metadata build_and_push_config build_and_push_order build_and_push_payment build_and_push_test_template
 
-build_and_push_app: login setup_buildx build_and_push_all
+build_and_push_env: login setup_buildx build_and_push_all
 	@echo "All images have been built and pushed successfully"

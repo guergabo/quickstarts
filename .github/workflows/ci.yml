@@ -40,7 +40,8 @@ jobs:
         username: _json_key                          # (1) Add to your repo.
         password: ${{ secrets.ANTITHESIS_GAR_KEY }}  # (2) Add to your repo.
 
-    # Config image
+    # Config image.
+
     - name: Extract metadata for config
       id: meta-config
       uses: docker/metadata-action@v5
@@ -61,7 +62,8 @@ jobs:
         tags: ${{ steps.meta-config.outputs.tags }}
         labels: ${{ steps.meta-config.outputs.labels }}
 
-    # Order image 
+    # Order image.
+
     - name: Extract metadata for order
       id: meta-order
       uses: docker/metadata-action@v5
@@ -82,7 +84,8 @@ jobs:
         tags: ${{ steps.meta-order.outputs.tags }}
         labels: ${{ steps.meta-order.outputs.labels }}
 
-    # Payment image
+    # Payment image.
+
     - name: Extract metadata for payment
       id: meta-payment
       uses: docker/metadata-action@v5
@@ -103,7 +106,8 @@ jobs:
         tags: ${{ steps.meta-payment.outputs.tags }}
         labels: ${{ steps.meta-payment.outputs.labels }}
 
-    # Test template image
+    # Test template image.
+
     - name: Extract metadata for test-template
       id: meta-test-template
       uses: docker/metadata-action@v5
@@ -123,7 +127,7 @@ jobs:
         push: true
         tags: ${{ steps.meta-test-template.outputs.tags }}
         labels: ${{ steps.meta-test-template.outputs.labels }}
-  # fix here.
+
   test: 
     needs: build 
     runs-on: ubuntu-latest
@@ -138,9 +142,9 @@ jobs:
         tenant: brick-whale                          # (4) Update to your tenant.
         username: ${{ secrets.ANTITHESIS_USERNAME }} # (5) Add to your repo. 
         password: ${{ secrets.ANTITHESIS_PASSWORD }} # (6) Add to your repo. 
-        github_token: ${{ secrets.GH_PAT }}          # (7) Add to your repo with specific permissions (check docs).
+        github_token: ${{ secrets.GH_PAT }}          # (7) Add to your repo with specific permissions (docs: https://www.antithesis.com/docs/using_antithesis/ci/#github-actions).
         email_recipients: gguergabo@gmail.com        # (8) Add the email you want the test report to be sent to.
-        config_image: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/config:v1
-        images: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/order:v1;us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/payment:v1;us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/test-template:v1;docker.io/postgres:16;docker.io/nats:latest;docker.io/stripemock/stripe-mock:latest;
+        config_image: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/config:latest
+        images: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/order:latest;us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/payment:latest;us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/test-template:latest;docker.io/postgres:16;docker.io/nats:latest;docker.io/stripemock/stripe-mock:latest;
         additional_parameters: |-
           antithesis.duration=15
