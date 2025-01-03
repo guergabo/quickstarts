@@ -95,7 +95,7 @@ antithesis run \
   --email='YOUR_EMAIL'
 ```
 
-## **005\. (WIP) Understanding what’s happening.** 
+## **005\. Understanding what’s happening.** 
 
 Congratulations on launching your first test run\! While the test is running (it takes approximately 25 minutes to generate the complete report), take this time to explore the project and review our documentation. This will help you build a mental model of how everything works. Here are a few suggestions:
 
@@ -103,10 +103,11 @@ Congratulations on launching your first test run\! While the test is running (it
 * [Antithesis SDKs](https://www.antithesis.com/docs/using_antithesis/sdk/) (*Pro tip: Search the project’s codebase for assert.\*, random.\*, and lifecycle.\* to see our SDKs in action*)  
 * [Instrumentation your code](https://www.antithesis.com/docs/instrumentation/). (*Pro tip: peak into the Dockerfiles).*  
 * [Antithesis Test Composer.](https://www.antithesis.com/docs/test_templates/) (*Pro tip: check out test/opt/antithesis/v1/\**)   
-* **WIP**: What is a config? Why docker-compose?   
+* Notice how the config image is simply packaging up your docker-compose.
 * [GitHub Action Integration.](https://www.antithesis.com/docs/using_antithesis/ci/) (*Pro tip: peak into the ci.yml*)  
-* **WIP**: Notice how we have to mock third-party dependencies like Stripe. (*Pro tip: peak at the docker-compose.yml*)   
-* **WIP**: Notice how duration is configurable. You’re no longer specifying test cases but thinking in terms of test hours.
+* Notice how we have to mock third-party dependencies like Stripe. (Pro tip: peak at the docker-compose.yml)
+* Notice how test duration is configurable. You’re no longer specifying test cases but thinking in terms of test hours.
+
 
 ## **006\. View Antithesis Test Report.**
 
