@@ -177,8 +177,7 @@ func (s *OrderService) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	assert.Sometimes(true, "msg", nil) // TODO:
-	assert.Sometimes(true, "msg", nil) // TODO:
+	// TODO: add Sometimes.
 
 	tx, err := s.db.BeginTx(r.Context(), nil)
 	if err != nil {
@@ -223,7 +222,6 @@ func (s *OrderService) Create(w http.ResponseWriter, r *http.Request) {
 
 	assert.AlwaysOrUnreachable(result.Order.UpdatedAt == nil, "New orders must have a null updated_at", Details{"updated_at": result.Order.UpdatedAt})
 	assert.AlwaysOrUnreachable(result.Order.Status == OrderStatusPending, "New orders must have a pending status", Details{"status": result.Order.Status})
-
 	assert.AlwaysOrUnreachable(result.OrderEvent.AggregateType == "Order", "Event must go to the order topic", nil)
 	assert.AlwaysOrUnreachable(result.OrderEvent.AggregateID == result.Order.ID, "AggregateID must map to orderID", nil)
 	assert.AlwaysOrUnreachable(result.OrderEvent.EventType == "ORDER_CREATED", "New order events must have ORDER_CREATED eventy type", nil)
@@ -280,8 +278,8 @@ func (s *OrderService) Get(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to to process orderID", http.StatusBadRequest)
 		return
 	}
-	assert.Sometimes(orderID%2 == 0, "msg", nil)
-	assert.Sometimes(orderID%2 == 1, "msg", nil)
+	assert.Sometimes(orderID%2 == 0, "Somestimes the order serivce gets an even orderID", nil)
+	assert.Sometimes(orderID%2 == 1, "Sometimes the order service gets an odd orderID", nil)
 
 	tx, err := s.db.BeginTx(r.Context(), nil)
 	if err != nil {

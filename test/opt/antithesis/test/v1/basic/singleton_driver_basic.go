@@ -162,13 +162,15 @@ func (s *OrderState) Write(in *Order) error {
 	return nil
 }
 
+//  TODO: grouped by message, easy gotcha.
+
 func (v *OrderValidator) VRead(result *OrderReadResult) error {
 	log.Printf("Validating reading order: %v\n", result.in)
 
-	assert.Sometimes(result.statusCode == http.StatusBadRequest, "Sometimes status code should be http.StatusBadRequest", nil)
-	assert.Sometimes(result.statusCode == http.StatusInternalServerError, "Sometimes status code should be http.StatusInternalServerError", nil)
-	assert.Sometimes(result.statusCode == http.StatusNotFound, "Sometimes status code should be http.StatusNotFound", nil)
-	assert.Sometimes(result.statusCode == http.StatusOK, "Sometimes status code should be http.StatusOK", nil)
+	assert.Sometimes(result.statusCode == http.StatusBadRequest, "Sometimes read result status code should be http.StatusBadRequest", map[string]any{"status_code": result.statusCode})
+	assert.Sometimes(result.statusCode == http.StatusInternalServerError, "Sometimes read result status code should be http.StatusInternalServerError", map[string]any{"status_code": result.statusCode})
+	assert.Sometimes(result.statusCode == http.StatusNotFound, "Sometimes read result status code should be http.StatusNotFound", map[string]any{"status_code": result.statusCode})
+	assert.Sometimes(result.statusCode == http.StatusOK, "Sometimes read result status code should be http.StatusOK", map[string]any{"status_code": result.statusCode})
 
 	switch result.statusCode {
 	case http.StatusBadRequest:
@@ -187,11 +189,11 @@ func (v *OrderValidator) VRead(result *OrderReadResult) error {
 			return fmt.Errorf("not found order locally even though got found from the service: %v\n", result.in)
 		}
 
-		assert.AlwaysOrUnreachable(local.ID == result.out.ID, "", nil)
-		assert.AlwaysOrUnreachable(local.Amount == result.out.Amount, "", nil)
-		assert.AlwaysOrUnreachable(local.CreatedAt == result.out.CreatedAt, "", nil)
-		assert.AlwaysOrUnreachable(local.Customer == result.out.Customer, "", nil)
-		assert.AlwaysOrUnreachable(local.Description == result.out.Description, "", nil)
+		assert.AlwaysOrUnreachable(local.ID == result.out.ID, "Read unexpected id value", map[string]any{"local_id": local.ID, "result_out_id": result.out.ID})
+		assert.AlwaysOrUnreachable(local.Amount == result.out.Amount, "Read unexpected amount value", map[string]any{"local_amount": local.Amount, "result_out_amount": result.out.Amount})
+		assert.AlwaysOrUnreachable(local.CreatedAt == result.out.CreatedAt, "Read unexpected created_at value", map[string]any{"local_created_at": local.CreatedAt, "result_out_created_at": result.out.CreatedAt})
+		assert.AlwaysOrUnreachable(local.Customer == result.out.Customer, "Read unexpected customer value", map[string]any{"local_customer": local.Customer, "result_out_customer": result.out.Customer})
+		assert.AlwaysOrUnreachable(local.Description == result.out.Description, "Read unexpected description value", map[string]any{"local_description": local.Description, "result_out_description": result.out.Description})
 	default:
 		assert.Unreachable("Status codes not exhaustive", map[string]any{"status_code": result.statusCode})
 	}
@@ -201,9 +203,9 @@ func (v *OrderValidator) VRead(result *OrderReadResult) error {
 
 func (v *OrderValidator) VWrite(result *OrderWriteResult) error {
 	log.Printf("Validating writing order: %v\n", result.in.ID)
-	assert.Sometimes(result.statusCode == http.StatusBadRequest, "Sometimes status code should be http.StatusBadRequest", nil)
-	assert.Sometimes(result.statusCode == http.StatusInternalServerError, "Sometimes status code should be http.StatusInternalServerError", nil)
-	assert.Sometimes(result.statusCode == http.StatusAccepted, "Sometimes status code should be http.StatusAccepted", nil)
+	assert.Sometimes(result.statusCode == http.StatusBadRequest, "Sometimes write result status code should be http.StatusBadRequest", map[string]any{"status_code": result.statusCode})
+	assert.Sometimes(result.statusCode == http.StatusInternalServerError, "Sometimes write result status code should be http.StatusInternalServerError", map[string]any{"status_code": result.statusCode})
+	assert.Sometimes(result.statusCode == http.StatusAccepted, "Sometimes write result status code should be http.StatusAccepted", map[string]any{"status_code": result.statusCode})
 
 	switch result.statusCode {
 	case http.StatusBadRequest:
