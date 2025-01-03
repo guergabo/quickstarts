@@ -10,6 +10,7 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -42,7 +43,6 @@ type OrderWriteResult struct {
 	statusCode int
 }
 
-// TODO: separate counter no worries. No need for lock.
 type counter struct {
 	count int
 	file  string
@@ -56,7 +56,6 @@ type ParallelDriverCommand struct {
 
 func main() {
 
-	// TODO: needs to environment variables.
 	hostPtr := flag.String("host", "order", "Host on which to ping the order service")
 	portPtr := flag.Int("port", 8000, "Port on which to ping the order service")
 
@@ -85,7 +84,7 @@ func main() {
 	ticks := (SafeUint64ToIntCapped(random.GetRandom()) % 100) + 100 // 1
 	c := counter{
 		count: 0,
-		file:  fmt.Sprintf("/global_counts/%s_globa_count.txt", uuid.New()), // TODO: most likely too long.
+		file:  fmt.Sprintf("/global_counts/%s_globa_count.txt", uuid.New()),
 	}
 	client := &OrderClient{
 		host: *hostPtr,
@@ -127,21 +126,29 @@ func (cmd *ParallelDriverCommand) process() error {
 	}
 
 	// Write was succesful and should count it.
-	// 1) 200
-	// 2) 300-400 - Nos
-	// 3) 500 - maybes?
+	// 1) 200.
+	// 2) 300-400 - No.
+	// 3) 500 - Maybe.
 	cmd.counter.count++
 	err = cmd.counter.save()
 	if err != nil {
 		return err
 	}
 
-	time.Sleep(1 * time.Second) // TODO:
+	time.Sleep(1 * time.Second)
 
 	return nil
 }
 
 func (c *counter) save() error {
+	log.Printf("Saving count %d to %s\n", c.count, c.file)
+
+	// Create the parent directory if it doesn't exist
+	dir := filepath.Dir(c.file)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory: %v", err)
+	}
+
 	// TODO: a failure mid-operation can leave the file in a partially written state. Make it an atomic Write.
 	return os.WriteFile(c.file, []byte(strconv.Itoa(int(c.count))), 0644)
 }
@@ -161,8 +168,6 @@ func (c *counter) load() error {
 
 func (c *OrderClient) Write() (*OrderWriteResult, error) {
 	payload := genOrder()
-
-	// TODO: sometimes assertion.
 
 	bs, err := json.Marshal(payload)
 	if err != nil {

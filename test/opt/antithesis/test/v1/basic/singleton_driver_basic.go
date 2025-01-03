@@ -62,7 +62,6 @@ type SingletonDriverCommand struct {
 }
 
 func main() {
-	// TODO: how would this be wired up? 
 	hostPtr := flag.String("host", "order", "Host on which to ping the order service")
 	portPtr := flag.Int("port", 8000, "Port on which to ping the order service")
 
@@ -202,8 +201,7 @@ func (v *OrderValidator) VRead(result *OrderReadResult) error {
 }
 
 func (v *OrderValidator) VWrite(result *OrderWriteResult) error {
-	log.Printf("Validating writing order: %v\n", result.out.ID)
-
+	log.Printf("Validating writing order: %v\n", result.in.ID)
 	assert.Sometimes(result.statusCode == http.StatusBadRequest, "Sometimes status code should be http.StatusBadRequest", nil)
 	assert.Sometimes(result.statusCode == http.StatusInternalServerError, "Sometimes status code should be http.StatusInternalServerError", nil)
 	assert.Sometimes(result.statusCode == http.StatusAccepted, "Sometimes status code should be http.StatusAccepted", nil)
@@ -264,8 +262,6 @@ func (c *OrderClient) Read() (*OrderReadResult, error) {
 
 func (c *OrderClient) Write() (*OrderWriteResult, error) {
 	payload := genOrder()
-
-	// TODO: sometimes assertion.
 
 	bs, err := json.Marshal(payload)
 	if err != nil {

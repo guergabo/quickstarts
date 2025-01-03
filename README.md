@@ -9,13 +9,13 @@ Welcome to Antithesis\! Let’s get started with Antithesis in 6 quick steps.
 ## **Prerequisites**
 
 * Docker installed and running.   
-* Credentials for Antithesis registry.  
-* Credentials for Antithesis platform.  
+* Credentials to access the Antithesis registry.  
+* Credentials to access the Antithesis platform.  
 * Homebrew.  
 * Golang.  
 * Basic familiarity with microservices. 
 
-## **001\. Install the Antithesis CLI.**
+## 1\) Install the Antithesis CLI
 
 We’ll be using the Antithesis CLI throughout this quickstart to create test runs.
 
@@ -29,7 +29,7 @@ Verify your installation and see some cool ASCII art:
 antithesis
 ```
 
-## **002\. Initialize an Antithesis project.**
+## 2\) Initialize an Antithesis project
 
 Create a dedicated directory:
 
@@ -51,31 +51,35 @@ cd quickstart
 
 The demo project includes two Go microservices (Order and Payment) that interact with Postgres, NATS, and a Stripe mock \- perfect for learning Antithesis’ core features.
 
-## **003\. Build and push your first test environment.**
+## 3\) Build and push your first test environment
 
-First, set up authentication to access the Antithesis private image registry. This allows you to pull and push container images required for your test environment:
+First, set up authentication to access the Antithesis private image registry. This allows you to pull and push container images required for your test environment. 
 
-```console 
-# Create the Antithesis configuration directory
-mkdir -p ~/.config/antithesis
-
-# Move your service account credentials to the config directory
-mv service-account.json ~/.config/antithesis
-
-# Configure authentication by setting the credentials as an environment variable
-export ANTITHESIS_GAR_KEY=$(cat ~/.config/antithesis/service-account.json)
-```
-
-Once authentication is configured, build and push your environment images:
+Create the Antithesis configuration directory: 
 
 ```console
-# Build and push all images that make up your test environment
+mkdir -p ~/.config/antithesis
+``` 
+
+Move your service account credentials to the config directory:
+```console
+mv service-account.json ~/.config/antithesis
+``` 
+
+Configure authentication by setting the credentials as an environment variable:
+```console
+export ANTITHESIS_GAR_KEY=$(cat ~/.config/antithesis/service-account.json)
+``` 
+
+Once authentication is configured, build and push your test environment to Antithesis:
+
+```console
 make build_and_push_env
 ```
 
-## **004\. Create your first Antithesis Test Run.**
+## 4\) Create your first Antithesis Test Run
 
-Now create your first test run with the name (replace tenant, username, password, email with your values):
+Now--time to create your first test run using the following command (replace tenant, username, password, email with your values):
 
 ```console
 antithesis run \
@@ -95,25 +99,25 @@ antithesis run \
   --email='YOUR_EMAIL'
 ```
 
-## **005\. Understanding what’s happening.** 
+## 5\) Understanding what’s happening
 
-Congratulations on launching your first test run\! While the test is running (it takes approximately 25 minutes to generate the complete report), take this time to explore the project and review our documentation. This will help you build a mental model of how everything works. Here are a few suggestions:
+Congratulations on launching your first test run\! While the test is running (it takes approximately 30 minutes to generate the complete report), take this time to explore the project and review our documentation. This will help you build a mental model of how everything works. Here are a few suggestions:
 
 * [How Antithesis Works](https://www.antithesis.com/docs/introduction/how_antithesis_works/)  
 * [Antithesis SDKs](https://www.antithesis.com/docs/using_antithesis/sdk/) (*Pro tip: Search the project’s codebase for assert.\*, random.\*, and lifecycle.\* to see our SDKs in action*)  
-* [Instrumentation your code](https://www.antithesis.com/docs/instrumentation/). (*Pro tip: peak into the Dockerfiles).*  
-* [Antithesis Test Composer.](https://www.antithesis.com/docs/test_templates/) (*Pro tip: check out test/opt/antithesis/v1/\**)   
+* [Instrumenting your code](https://www.antithesis.com/docs/instrumentation/) (*Pro tip: peek into the Dockerfiles).*  
+* [Antithesis Test Composer](https://www.antithesis.com/docs/test_templates/) (*Pro tip: check out test/opt/antithesis/v1/\**)   
 * Notice how the config image is simply packaging up your docker-compose.
-* [GitHub Action Integration.](https://www.antithesis.com/docs/using_antithesis/ci/) (*Pro tip: peak into the ci.yml*)  
-* Notice how we have to mock third-party dependencies like Stripe. (Pro tip: peak at the docker-compose.yml)
+* Notice how we have to mock third-party dependencies like Stripe. (Pro tip: peek at the docker-compose.yml)
 * Notice how test duration is configurable. You’re no longer specifying test cases but thinking in terms of test hours.
+* [GitHub Action Integration](https://www.antithesis.com/docs/using_antithesis/ci/) (*Pro tip: peek into the ci.yml*)  
 
 
-## **006\. View Antithesis Test Report.**
+## 6\) View Antithesis Test Report
 
-After 25 minutes, your test report should be available in your email. For help interpreting the results, please refer to our [documentation on test reports](https://www.antithesis.com/docs/reports/triage/).
+After 30 minutes, your test report should be available in your email. To interpret the results, please refer to our [documentation on test reports](https://www.antithesis.com/docs/reports/triage/).
 
-## **007\. Next steps.** 
+## What's next?
 
 Feel free to play around with the quickstart. Your development workflow will look like this: 
 

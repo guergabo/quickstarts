@@ -235,6 +235,7 @@ func (s *OrderService) Create(w http.ResponseWriter, r *http.Request) {
 		"description": req.Description,
 	})
 	assert.Always(err == nil, "Must be able to marshal expected payload", Details{"error": err})
+	//TODO:  .00 - keep this one for fun... also + finally_consistent assertion one.
 	assert.Always(bytes.Equal(result.OrderEvent.EventPayload, expectedPayload),
 		"Event payload must match expected payload",
 		Details{
@@ -477,7 +478,7 @@ func (s *OrderService) dequeueUnprocessedEvents(ctx context.Context, tx *sql.Tx,
 			return nil, fmt.Errorf("failed to scan order: %w", err)
 		}
 
-		assert.Always(event.ProcessedAt == nil, "Unprocessed events must not have processed timestamp", Details{
+		assert.Always(event.ProcessedAt == nil, "Unprocessed events must not have processed timestamp", Details{ // or unreachable ?
 			"event_id":     event.ID,
 			"processed_at": event.ProcessedAt,
 		})

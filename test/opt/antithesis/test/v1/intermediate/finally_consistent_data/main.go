@@ -17,8 +17,6 @@ import (
 	"github.com/antithesishq/antithesis-sdk-go/lifecycle"
 )
 
-// TODO: Maybe need first command to clean up.
-
 type Order struct {
 	ID          int64   `json:"id" db:"id"`
 	Amount      float64 `json:"amount" db:"amount"`
@@ -45,14 +43,8 @@ type FinallyQuiescentCommand struct {
 	client *OrderClient
 }
 
-// TODO: need a way to query all of this info.
-// File, Producer DB AND Consumer data.
-// OR actually can just do a search. everythign should
-// be updated to pass finally... in the producer db.
-// and go go go... implement that though.
 func main() {
 
-	// TODO: needs to environment variables.
 	hostPtr := flag.String("host", "order", "Host on which to ping the order service")
 	portPtr := flag.Int("port", 8000, "Port on which to ping the order service")
 
@@ -174,9 +166,7 @@ func Validate(globalCount int, source *OrderListResult) error {
 		// perfect
 		return nil
 	} else if globalCount < actualCount {
-		// TODO: this is possible because of fault injector.
-		// You can under count.
-		// BUT if you over count that is bad.
+		// This is possible because of fault injector.
 		return nil
 	} else {
 		assert.Unreachable("Global count should not be greater than actual count", details)
