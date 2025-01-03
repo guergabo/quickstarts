@@ -79,7 +79,7 @@ make env
 
 ## 4\) Create your first Antithesis Test Run
 
-Now--time to create your first test run using the following command (replace tenant, username, password, email with your values):
+Now--time to create your first test run using the following command (replace `tenant`, `username`, `password`, and `email` with your values):
 
 ```console
 antithesis run \
