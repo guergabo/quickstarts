@@ -42,3 +42,42 @@ After `first` command and during a period where Antithesis may be adding faults 
 make build_test_template 
 docker run -it --entrypoint /bin/bash workload:v1
 ```
+
+--- 
+
+intermediate/
+
+# Goal 
+
+Verify that the consumer eventually processes all messages sent by the producer and test heavily all the internal assertions. 
+
+parallel: 
+
+1) write
+2) write file
+
+```
+customer repo.clone uber
+```
+
+finally: 
+
+1) query files
+2) query databases
+3) query log files
+
+200 
+
+300-400 = No? 
+
+500 = maybe 
+
+````
+```
+
+
+basic/ 
+
+# Goal 
+
+Verify that the producer writes correctly.
