@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   service.test-template:
-    image: test-template:v1
+    image: test-template:latest
     container_name: test-template
     networks:
       basic-net:
@@ -10,42 +10,25 @@ services:
     user: root
     depends_on: 
       - service.order
-    # TODO: have to add environment variables.
 
   service.order:
-    image: order:v1
+    image: order:latest
     container_name: order
     hostname: order
     networks:
       basic-net:
         ipv4_address: 10.0.0.11
-    # TODO: make configurable.
-    # command: [
-    #   "./order" 
-    #   "--db-host=postgres",
-    #   "--db-port=5432",
-    #   "--db-name=orderdb",
-    #   "--db-user=orderuser",
-    #   "--db-password=orderpass",
-    #   "--nats-url=nats://nats:4222"
-    # ]
     depends_on: 
       - infra.postgres
       - infra.nats
 
   service.payment:
-    image: payment:v1
+    image: payment:latest
     container_name: payment
     hostname: payment
     networks:
       basic-net:
         ipv4_address: 10.0.0.12
-    # TODO: make configurable.
-    # command: [
-    #   "./payment",
-    #   "--nats-url=nats://nats:4222",
-    #   "--stripe-base-url=http://stripe-mock:12111"
-    # ]
     depends_on: 
       - infra.nats
       - infra.stripe-mock

@@ -123,13 +123,12 @@ jobs:
         push: true
         tags: ${{ steps.meta-test-template.outputs.tags }}
         labels: ${{ steps.meta-test-template.outputs.labels }}
-
+  # fix here.
   test: 
     needs: build 
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-
     - name: Run Antithesis Tests
       uses: antithesishq/antithesis-trigger-action@main
       with:
@@ -140,15 +139,8 @@ jobs:
         username: ${{ secrets.ANTITHESIS_USERNAME }} # (5) Add to your repo. 
         password: ${{ secrets.ANTITHESIS_PASSWORD }} # (6) Add to your repo. 
         github_token: ${{ secrets.GH_PAT }}          # (7) Add to your repo with specific permissions (check docs).
-        email_recipients: gguergabo@gmail.com        # (8)
+        email_recipients: gguergabo@gmail.com        # (8) Add the email you want the test report to be sent to.
         config_image: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/config:v1
         images: us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/order:v1;us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/payment:v1;us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/test-template:v1;docker.io/postgres:16;docker.io/nats:latest;docker.io/stripemock/stripe-mock:latest;
-        # images: >-
-        #   us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/order:v1;
-        #   us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/payment:v1;
-        #   us-central1-docker.pkg.dev/molten-verve-216720/ant-pdogfood-repository/test-template:v1;
-        #   docker.io/postgres:16;
-        #   docker.io/nats:latest;
-        #   docker.io/stripemock/stripe-mock:latest;
         additional_parameters: |-
-          antithesis.duration=5
+          antithesis.duration=15
