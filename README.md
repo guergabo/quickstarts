@@ -2,11 +2,11 @@
 
 #### **Getting Started**
 
-### **Quickstart**
+## **Quickstart**
 
 Welcome to Antithesis\! Let’s get started with Antithesis in 6 quick steps.
 
-#### **Prerequisites**
+### **Prerequisites**
 
 * Docker installed and running.   
 * Credentials for Antithesis registry.  
@@ -15,7 +15,7 @@ Welcome to Antithesis\! Let’s get started with Antithesis in 6 quick steps.
 * Golang.  
 * Basic familiarity with microservices. 
 
-**001\. Install the Antithesis CLI.**
+### **001\. Install the Antithesis CLI.**
 
 We’ll be using the Antithesis CLI throughout this quickstart to create test runs.
 
@@ -29,7 +29,7 @@ Verify your installation and see some cool ASCII art:
 antithesis
 ```
 
-**002\. Initialize an Antithesis project.**
+### **002\. Initialize an Antithesis project.**
 
 Create a dedicated directory:
 
@@ -51,7 +51,7 @@ cd quickstart
 
 The demo project includes two Go microservices (Order and Payment) that interact with Postgres, NATS, and a Stripe mock \- perfect for learning Antithesis’ core features.
 
-**003\. Build and push your first test environment.**
+### **003\. Build and push your first test environment.**
 
 First, set up authentication to access the Antithesis private image registry. This allows you to pull and push container images required for your test environment:
 
@@ -73,7 +73,7 @@ Once authentication is configured, build and push your environment images:
 make build_and_push_env
 ```
 
-**004\. Create your first Antithesis Test Run.**
+### **004\. Create your first Antithesis Test Run.**
 
 Now create your first test run with the name (replace tenant, username, password, email with your values):
 
@@ -95,7 +95,7 @@ antithesis run \
   --email='YOUR_EMAIL'
 ```
 
-**005\. (WIP) Understanding what’s happening.** 
+### **005\. (WIP) Understanding what’s happening.** 
 
 Congratulations on launching your first test run\! While the test is running (it takes approximately 25 minutes to generate the complete report), take this time to explore the project and review our documentation. This will help you build a mental model of how everything works. Here are a few suggestions:
 
@@ -108,11 +108,11 @@ Congratulations on launching your first test run\! While the test is running (it
 * **WIP**: Notice how we have to mock third-party dependencies like Stripe. (*Pro tip: peak at the docker-compose.yml*)   
 * **WIP**: Notice how duration is configurable. You’re no longer specifying test cases but thinking in terms of test hours.
 
-**006\. View Antithesis Test Report.**
+### **006\. View Antithesis Test Report.**
 
 After 25 minutes, your test report should be available in your email. For help interpreting the results, please refer to our [documentation on test reports](https://www.antithesis.com/docs/reports/triage/).
 
-**007\. Next steps.** 
+### **007\. Next steps.** 
 
 Feel free to play around with the quickstart. Your development workflow will look like this: 
 
