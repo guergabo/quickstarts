@@ -115,7 +115,9 @@ Congratulations on launching your first test run\! While the test is running (it
 
 ## 6\) View Antithesis Test Report
 
-After 30 minutes, your test report should be available in your email. To interpret the results, please refer to our [documentation on test reports](https://www.antithesis.com/docs/reports/triage/).
+After 30 minutes, you should receive a test report in your email that looks like the image below. To interpret the results, please refer to our [documentation on test reports](https://www.antithesis.com/docs/reports/triage/).
+
+<img width="1506" alt="Screenshot 2025-01-03 at 2 32 30 AM" src="https://github.com/user-attachments/assets/d8090ec3-d138-4ca4-a710-7401bf2221f3" />
 
 One notable feature is the ability to view not only the current run's results but also the recent changes, including when a property last failed. As you can see from my track record, I've been practicing classic Test-Driven Development - with plenty of stumbles along the way. Let's just say surviving in Antithesis' environment requires both persistence and a high tolerance for failure messages. The road to passing tests is paved in red.
 
