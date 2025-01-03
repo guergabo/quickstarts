@@ -221,12 +221,12 @@ func (s *OrderService) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	assert.Always(result.Order.UpdatedAt == nil, "New orders must have a null updated_at", Details{"updated_at": result.Order.UpdatedAt})
-	assert.Always(result.Order.Status == OrderStatusPending, "New orders must have a pending status", Details{"status": result.Order.Status})
+	assert.AlwaysOrUnreachable(result.Order.UpdatedAt == nil, "New orders must have a null updated_at", Details{"updated_at": result.Order.UpdatedAt})
+	assert.AlwaysOrUnreachable(result.Order.Status == OrderStatusPending, "New orders must have a pending status", Details{"status": result.Order.Status})
 
-	assert.Always(result.OrderEvent.AggregateType == "Order", "Event must go to the order topic", nil)
-	assert.Always(result.OrderEvent.AggregateID == result.Order.ID, "AggregateID must map to orderID", nil)
-	assert.Always(result.OrderEvent.EventType == "ORDER_CREATED", "New order events must have ORDER_CREATED eventy type", nil)
+	assert.AlwaysOrUnreachable(result.OrderEvent.AggregateType == "Order", "Event must go to the order topic", nil)
+	assert.AlwaysOrUnreachable(result.OrderEvent.AggregateID == result.Order.ID, "AggregateID must map to orderID", nil)
+	assert.AlwaysOrUnreachable(result.OrderEvent.EventType == "ORDER_CREATED", "New order events must have ORDER_CREATED eventy type", nil)
 
 	expectedPayload, err := json.Marshal(map[string]interface{}{
 		"amount":      req.Amount,
@@ -234,16 +234,16 @@ func (s *OrderService) Create(w http.ResponseWriter, r *http.Request) {
 		"customer":    req.Customer,
 		"description": req.Description,
 	})
-	assert.Always(err == nil, "Must be able to marshal expected payload", Details{"error": err})
+	assert.AlwaysOrUnreachable(err == nil, "Must be able to marshal expected payload", Details{"error": err})
 	//TODO:  .00 - keep this one for fun... also + finally_consistent assertion one.
-	assert.Always(bytes.Equal(result.OrderEvent.EventPayload, expectedPayload),
+	assert.AlwaysOrUnreachable(bytes.Equal(result.OrderEvent.EventPayload, expectedPayload),
 		"Event payload must match expected payload",
 		Details{
 			"actual_payload":   string(result.OrderEvent.EventPayload),
 			"expected_payload": string(expectedPayload),
 		})
-	assert.Always(result.OrderEvent.ProcessedAt == nil, "New order events must have a null processed_at", nil)
-	assert.Always(result.OrderEvent.Status == OutboxStatusPending, "New order events must have a pending status", nil)
+	assert.AlwaysOrUnreachable(result.OrderEvent.ProcessedAt == nil, "New order events must have a null processed_at", nil)
+	assert.AlwaysOrUnreachable(result.OrderEvent.Status == OutboxStatusPending, "New order events must have a pending status", nil)
 
 	if err = tx.Commit(); err != nil {
 		http.Error(w, "Failed to serialize response", http.StatusInternalServerError)
@@ -307,7 +307,7 @@ func (s *OrderService) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	assert.Always(order.Amount > 0, "Retrieved order must have positive amount", Details{"amount": order.Amount})
+	assert.AlwaysOrUnreachable(order.Amount > 0, "Retrieved order must have positive amount", Details{"amount": order.Amount})
 
 	if err = tx.Commit(); err != nil {
 		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
@@ -370,7 +370,7 @@ func (s *OrderService) List(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Number of orders: %d\n", len(orders))
 
-	assert.Always(len(orders) >= 0, "Retrieved number of orders must be a non-negative amount", Details{"length": len(orders)})
+	assert.AlwaysOrUnreachable(len(orders) >= 0, "Retrieved number of orders must be a non-negative amount", Details{"length": len(orders)})
 
 	if err = tx.Commit(); err != nil {
 		http.Error(w, "Failed to commit transaction", http.StatusInternalServerError)
@@ -403,18 +403,20 @@ func (s *OrderService) processOutboxEvents(ctx context.Context, batchSize int) {
 			return
 		case <-ticker.C:
 			if err := s.processNextBatch(ctx, batchSize); err != nil {
-				log.Fatalf("Error processing batch: %v\n", err)
+				log.Printf("Error processing batch: %v\n", err)
 			}
 		}
 	}
 }
 
-func (s *OrderService) processNextBatch(ctx context.Context, batchSize int) error {
+func (s *OrderService) processNextBatch(ctx context.Context, batchSize int) error { // TODO: batch properly.
 	assert.Always(s.started, "Service must be started before processing next batch", Details{"op": "process_next_batch"})
 	assert.Always(batchSize > 0 && batchSize <= 100, "Batch size must be between 1 and 100", Details{"batch_size": batchSize})
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
+		// When the connection has been closed or terminated unexpectedly.
+		// The "EOF" (End of File) error indicates that the connection was terminated while trying to read from it.
 		return fmt.Errorf("failed to start transaction: %w", err)
 	}
 	defer tx.Rollback()
@@ -449,7 +451,7 @@ func (s *OrderService) processNextBatch(ctx context.Context, batchSize int) erro
 		}
 		successCount++
 	}
-	assert.Always(len(results) == (successCount+failureCount), "", nil)
+	assert.AlwaysOrUnreachable(len(results) == (successCount+failureCount), "", nil)
 
 	log.Printf("Batch processing completed: %d succeeded, %d failed\n", successCount, failureCount)
 	return nil
@@ -478,11 +480,11 @@ func (s *OrderService) dequeueUnprocessedEvents(ctx context.Context, tx *sql.Tx,
 			return nil, fmt.Errorf("failed to scan order: %w", err)
 		}
 
-		assert.Always(event.ProcessedAt == nil, "Unprocessed events must not have processed timestamp", Details{ // or unreachable ?
+		assert.AlwaysOrUnreachable(event.ProcessedAt == nil, "Unprocessed events must not have processed timestamp", Details{ // or unreachable ?
 			"event_id":     event.ID,
 			"processed_at": event.ProcessedAt,
 		})
-		assert.Always(event.Status == OutboxStatusPending, "Unprocessed events must have pending status", Details{
+		assert.AlwaysOrUnreachable(event.Status == OutboxStatusPending, "Unprocessed events must have pending status", Details{
 			"event_id": event.ID,
 			"status":   event.Status,
 		})
@@ -493,7 +495,7 @@ func (s *OrderService) dequeueUnprocessedEvents(ctx context.Context, tx *sql.Tx,
 		return nil, fmt.Errorf("error iterating over rows: %w", err)
 	}
 
-	assert.Always(len(orderEvents) <= batchSize, "Batch size limit must be respected", Details{
+	assert.AlwaysOrUnreachable(len(orderEvents) <= batchSize, "Batch size limit must be respected", Details{
 		"actual_size": len(orderEvents),
 		"max_size":    batchSize,
 	})
@@ -537,8 +539,8 @@ func (s *OrderService) processEvent(ctx context.Context, tx *sql.Tx, event Order
 		return result
 	}
 
-	assert.Always(ordersEvent.ProcessedAt != nil && *ordersEvent.ProcessedAt == processedAt, "ProcessedAt must not be nil", nil)
-	assert.Always(ordersEvent.Status == OutboxStatusSucceeded, "Must have success status", nil)
+	assert.AlwaysOrUnreachable(ordersEvent.ProcessedAt != nil && *ordersEvent.ProcessedAt == processedAt, "ProcessedAt must not be nil", nil)
+	assert.AlwaysOrUnreachable(ordersEvent.Status == OutboxStatusSucceeded, "Must have success status", nil)
 	return result
 }
 

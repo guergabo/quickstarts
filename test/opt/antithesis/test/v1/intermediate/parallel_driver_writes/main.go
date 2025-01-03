@@ -107,9 +107,8 @@ func main() {
 	// Generate tests.
 
 	for i := 0; i < cmd.ticks; i++ {
-		if err := cmd.process(); err != nil {
-			assert.Always(err == nil, "", map[string]any{"error": err})
-		}
+		err := cmd.process()
+		assert.Always(err == nil, "", map[string]any{"error": err})
 	}
 
 	log.Printf("Completed parallel test command\n")

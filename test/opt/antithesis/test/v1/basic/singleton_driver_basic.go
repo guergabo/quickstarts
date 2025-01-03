@@ -118,9 +118,8 @@ func main() {
 	// Generate tests.
 
 	for i := 0; i < cmd.ticks; i++ {
-		if err := cmd.process(); err != nil {
-			assert.Always(err == nil, "", map[string]any{"error": err})
-		}
+		err := cmd.process()
+		assert.Always(err == nil, "", map[string]any{"error": err})
 	}
 
 	log.Printf("Completed singleton test command\n")
@@ -188,11 +187,11 @@ func (v *OrderValidator) VRead(result *OrderReadResult) error {
 			return fmt.Errorf("not found order locally even though got found from the service: %v\n", result.in)
 		}
 
-		assert.Always(local.ID == result.out.ID, "", nil)
-		assert.Always(local.Amount == result.out.Amount, "", nil)
-		assert.Always(local.CreatedAt == result.out.CreatedAt, "", nil)
-		assert.Always(local.Customer == result.out.Customer, "", nil)
-		assert.Always(local.Description == result.out.Description, "", nil)
+		assert.AlwaysOrUnreachable(local.ID == result.out.ID, "", nil)
+		assert.AlwaysOrUnreachable(local.Amount == result.out.Amount, "", nil)
+		assert.AlwaysOrUnreachable(local.CreatedAt == result.out.CreatedAt, "", nil)
+		assert.AlwaysOrUnreachable(local.Customer == result.out.Customer, "", nil)
+		assert.AlwaysOrUnreachable(local.Description == result.out.Description, "", nil)
 	default:
 		assert.Unreachable("Status codes not exhaustive", map[string]any{"status_code": result.statusCode})
 	}

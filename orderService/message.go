@@ -64,7 +64,7 @@ func NewJetStreamStore(config *NatsConfig) (*JetStreamStore, error) {
 		return nil, fmt.Errorf("failed to create JetStream context: %w", err)
 	}
 
-	assert.Always(nc.IsConnected(), "NATS server must be reachable", nil)
+	assert.AlwaysOrUnreachable(nc.IsConnected(), "NATS server must be reachable", nil)
 
 	return &JetStreamStore{
 		config: config,

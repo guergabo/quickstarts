@@ -74,7 +74,7 @@ export ANTITHESIS_GAR_KEY=$(cat ~/.config/antithesis/service-account.json)
 Once authentication is configured, build and push your test environment to Antithesis:
 
 ```console
-make build_and_push_env
+make env
 ```
 
 ## 4\) Create your first Antithesis Test Run
@@ -116,6 +116,8 @@ Congratulations on launching your first test run\! While the test is running (it
 ## 6\) View Antithesis Test Report
 
 After 30 minutes, your test report should be available in your email. To interpret the results, please refer to our [documentation on test reports](https://www.antithesis.com/docs/reports/triage/).
+
+One notable feature is the ability to view not only the current run's results but also the recent changes, including previous failures. As you can see from my track record, I've been practicing classic Test-Driven Development - with plenty of stumbles along the way. Let's just say surviving in Antithesis' environment requires both persistence and a high tolerance for failure messages. The road to passing tests is paved in red.
 
 ## What's next?
 

@@ -92,7 +92,7 @@ func main() {
 		log.Fatalf("error: %v\n", err)
 	}
 
-	assert.Always(Validate(globalCount, actualCount) == nil, "FAILED", nil)
+	assert.Always(Validate(globalCount, actualCount) == nil, "FAILED", map[string]any{"global_count": globalCount, "actual_count": actualCount})
 	log.Printf("Completed finally test command\n")
 }
 
@@ -131,7 +131,7 @@ func (c *OrderClient) List() (*OrderListResult, error) {
 		}, nil
 	}
 
-	assert.Always(resp.StatusCode == http.StatusOK, "", nil)
+	assert.AlwaysOrUnreachable(resp.StatusCode == http.StatusOK, "", nil)
 
 	var orders []Order
 	body, err := io.ReadAll(resp.Body)

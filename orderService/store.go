@@ -69,7 +69,7 @@ func NewPostgresStore(config *Config) (*PostgresStore, error) {
 		time.Sleep(delay)
 	}
 
-	assert.Always(db.Ping() == nil, "Database must be reachable", nil)
+	assert.AlwaysOrUnreachable(db.Ping() == nil, "Database must be reachable", nil)
 
 	return &PostgresStore{
 		config: config,
