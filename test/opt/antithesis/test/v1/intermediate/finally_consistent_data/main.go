@@ -92,7 +92,7 @@ func main() {
 		log.Fatalf("error: %v\n", err)
 	}
 
-	assert.Always(Validate(globalCount, actualCount) == nil, "FAILED", map[string]any{"global_count": globalCount, "actual_count": actualCount})
+	assert.Always(Validate(globalCount, actualCount) == nil, "Failed to be evenetually consistent", map[string]any{"global_count": globalCount, "actual_count": actualCount})
 	log.Printf("Completed finally test command\n")
 }
 
