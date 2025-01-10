@@ -83,8 +83,6 @@ func main() {
 		}
 	}
 
-	lifecycle.SetupComplete(map[string]any{"tag": "details"})
-
 	// Generate test distribution.
 
 	ticks := (SafeUint64ToIntCapped(random.GetRandom()) % 100) + 100 // 1

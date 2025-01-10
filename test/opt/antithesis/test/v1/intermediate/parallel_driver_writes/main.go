@@ -77,8 +77,6 @@ func main() {
 		}
 	}
 
-	lifecycle.SetupComplete(map[string]any{"tag": "details"})
-
 	// Generate writes.
 
 	ticks := (SafeUint64ToIntCapped(random.GetRandom()) % 100) + 100 // 1

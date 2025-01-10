@@ -107,7 +107,7 @@ func main() {
 	}()
 
 	lifecycle.SendEvent("handle_event", Details{"message": "Handle is called.", "method": r.Method})
-	lifecycle.SetupComplete(Details{"port": 8000}) // move this to workload so it knows.
+	lifecycle.SetupComplete(Details{"port": 8000})
 
 	// Graceful shutdown handling.
 	select {
